@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,7 +25,9 @@ import {
   PiMapPin,
   PiBriefcase,
   PiFileText,
+  PiSpinner,
 } from "react-icons/pi";
+import { IoCloudDone } from "react-icons/io5";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -235,6 +238,7 @@ export function BuilderClient({
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [editSection, setEditSection] = useState<TypedSection | null>(null);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -250,6 +254,7 @@ export function BuilderClient({
 
   const handlePublish = async () => {
     setIsPublishing(true);
+    setIsSyncing(true);
     try {
       const response = await fetch(`/api/careers/${companyId}`, {
         method: "PATCH",
@@ -273,6 +278,7 @@ export function BuilderClient({
       );
     } finally {
       setIsPublishing(false);
+      setIsSyncing(false);
     }
   };
 
@@ -281,6 +287,7 @@ export function BuilderClient({
       return;
     }
 
+    setIsSyncing(true);
     try {
       const response = await fetch(
         `/api/careers/${companyId}/sections/${sectionId}`,
@@ -302,6 +309,8 @@ export function BuilderClient({
       toast.error(
         error instanceof Error ? error.message : "Failed to delete section"
       );
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -314,6 +323,7 @@ export function BuilderClient({
 
       const newSections = arrayMove(sections, oldIndex, newIndex);
       setSections(newSections);
+      setIsSyncing(true);
 
       // Update order in database
       try {
@@ -333,11 +343,14 @@ export function BuilderClient({
         toast.error("Failed to reorder sections");
         // Revert on error
         setSections(sections);
+      } finally {
+        setIsSyncing(false);
       }
     }
   };
 
   const handleSectionAdded = async () => {
+    setIsSyncing(true);
     // Fetch updated sections from the API
     try {
       const response = await fetch(`/api/careers/${companyId}`);
@@ -358,11 +371,14 @@ export function BuilderClient({
       }
     } catch (error) {
       console.error("Error fetching sections:", error);
+    } finally {
+      setIsSyncing(false);
     }
     router.refresh();
   };
 
   const handleSectionUpdated = async () => {
+    setIsSyncing(true);
     // Fetch updated sections from the API
     try {
       const response = await fetch(`/api/careers/${companyId}`);
@@ -383,6 +399,8 @@ export function BuilderClient({
       }
     } catch (error) {
       console.error("Error fetching sections:", error);
+    } finally {
+      setIsSyncing(false);
     }
     router.refresh();
   };
@@ -392,7 +410,38 @@ export function BuilderClient({
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Careers Page Builder</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold">Careers Page Builder</h1>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={isSyncing || isPublishing ? "syncing" : "synced"}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                  className={`relative border p-2 rounded-full transition-colors ${
+                    isSyncing || isPublishing ? "bg-muted" : "bg-green-100"
+                  }`}
+                >
+                  {isSyncing || isPublishing ? (
+                    <PiSpinner className="h-6 w-6 text-muted-foreground animate-spin" />
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15,
+                        delay: 0.1,
+                      }}
+                    >
+                      <IoCloudDone className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
             <p className="text-muted-foreground">
               Customize your company's careers page
             </p>
