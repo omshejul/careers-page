@@ -57,6 +57,7 @@ interface BuilderClientProps {
   careersPage: {
     id: string;
     published: boolean;
+    hasUnpublishedChanges: boolean;
     seoTitle: string | null;
     seoDescription: string | null;
   };
@@ -448,15 +449,19 @@ export function BuilderClient({
           </div>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
-              <a href={`/${companySlug}`} target="_blank">
+              <a href={`/${companySlug}?preview=true`} target="_blank">
                 <PiEye className="mr-1 h-4 w-4" />
                 Preview
               </a>
             </Button>
-            {!careersPage.published && (
+            {(!careersPage.published || careersPage.hasUnpublishedChanges) && (
               <Button onClick={handlePublish} disabled={isPublishing}>
                 <PiGlobe className="mr-1 h-4 w-4" />
-                {isPublishing ? "Publishing..." : "Publish"}
+                {isPublishing
+                  ? "Publishing..."
+                  : careersPage.published
+                  ? "Publish Changes"
+                  : "Publish"}
               </Button>
             )}
           </div>
@@ -468,6 +473,14 @@ export function BuilderClient({
           <Badge variant={careersPage.published ? "default" : "secondary"}>
             {careersPage.published ? "Published" : "Draft"}
           </Badge>
+          {careersPage.published && careersPage.hasUnpublishedChanges && (
+            <Badge
+              variant="outline"
+              className="border-amber-500 text-amber-600"
+            >
+              Unpublished Changes
+            </Badge>
+          )}
         </div>
 
         {/* Sections List */}

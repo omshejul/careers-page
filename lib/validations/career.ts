@@ -91,6 +91,7 @@ export const updateSectionSchema = z.object({
 // Careers Page
 export const updateCareersPageSchema = z.object({
   published: z.boolean().optional(),
+  hasUnpublishedChanges: z.boolean().optional(),
   seoTitle: z.string().max(100).optional(),
   seoDescription: z.string().max(300).optional(),
 })

@@ -70,6 +70,7 @@ export default async function BuilderPage({
       careersPage={{
         id: careersPage._id.toString(),
         published: careersPage.published,
+        hasUnpublishedChanges: careersPage.hasUnpublishedChanges ?? true,
         seoTitle: careersPage.seoTitle,
         seoDescription: careersPage.seoDescription,
       }}

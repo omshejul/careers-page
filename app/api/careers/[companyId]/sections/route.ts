@@ -61,6 +61,11 @@ export async function POST(
       data: validatedData.data as any,
     })
 
+    // Mark careers page as having unpublished changes
+    await CareersPage.findByIdAndUpdate(careersPage._id, {
+      hasUnpublishedChanges: true,
+    })
+
     return NextResponse.json({
       data: {
         ...section.toObject(),

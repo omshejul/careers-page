@@ -68,6 +68,11 @@ export async function PATCH(
     Object.assign(section, validatedData)
     await section.save()
 
+    // Mark careers page as having unpublished changes
+    await CareersPage.findByIdAndUpdate(careersPage._id, {
+      hasUnpublishedChanges: true,
+    })
+
     return NextResponse.json({
       data: {
         ...section.toObject(),
@@ -139,6 +144,11 @@ export async function DELETE(
         { status: 404 }
       )
     }
+
+    // Mark careers page as having unpublished changes
+    await CareersPage.findByIdAndUpdate(careersPage._id, {
+      hasUnpublishedChanges: true,
+    })
 
     return NextResponse.json({ message: 'Section deleted successfully' })
   } catch (error) {

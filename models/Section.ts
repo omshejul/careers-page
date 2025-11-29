@@ -8,6 +8,7 @@ export interface ISection extends Document {
   order: number
   enabled: boolean
   data: Record<string, any>
+  publishedData?: Record<string, any> // Last published version of data
   createdAt: Date
   updatedAt: Date
 }
@@ -23,6 +24,7 @@ const SectionSchema = new Schema<ISection>(
     order: { type: Number, required: true },
     enabled: { type: Boolean, default: true },
     data: { type: Schema.Types.Mixed, required: true },
+    publishedData: { type: Schema.Types.Mixed }, // Stores last published version
   },
   {
     timestamps: true,
