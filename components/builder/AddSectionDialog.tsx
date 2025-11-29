@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Select,
   SelectContent,
@@ -461,15 +462,13 @@ export function AddSectionDialog({
                         disabled={isSubmitting}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="bannerUrl">Banner Image URL</Label>
-                      <Input
-                        id="bannerUrl"
-                        {...register("data.bannerUrl")}
-                        placeholder="https://example.com/image.jpg"
-                        disabled={isSubmitting}
-                      />
-                    </div>
+                    <ImageUpload
+                      label="Banner Image"
+                      value={(watch("data.bannerUrl") as string) || undefined}
+                      onChange={(url) => setValue("data.bannerUrl" as any, url)}
+                      folder="banners"
+                      disabled={isSubmitting}
+                    />
                   </>
                 )}
 
@@ -601,9 +600,20 @@ export function AddSectionDialog({
                               {...register(`data.values.${index}.description`)}
                               disabled={isSubmitting}
                             />
-                            <Input
-                              placeholder="Icon URL (optional)"
-                              {...register(`data.values.${index}.icon`)}
+                            <ImageUpload
+                              label="Icon (optional)"
+                              value={
+                                (watch(
+                                  `data.values.${index}.icon`
+                                ) as unknown as string | undefined) || undefined
+                              }
+                              onChange={(url) =>
+                                setValue(
+                                  `data.values.${index}.icon` as any,
+                                  url
+                                )
+                              }
+                              folder="icons"
                               disabled={isSubmitting}
                             />
                           </div>
@@ -683,9 +693,20 @@ export function AddSectionDialog({
                               )}
                               disabled={isSubmitting}
                             />
-                            <Input
-                              placeholder="Icon URL (optional)"
-                              {...register(`data.benefits.${index}.icon`)}
+                            <ImageUpload
+                              label="Icon (optional)"
+                              value={
+                                (watch(
+                                  `data.benefits.${index}.icon`
+                                ) as unknown as string | undefined) || undefined
+                              }
+                              onChange={(url) =>
+                                setValue(
+                                  `data.benefits.${index}.icon` as any,
+                                  url
+                                )
+                              }
+                              folder="icons"
                               disabled={isSubmitting}
                             />
                           </div>
@@ -734,7 +755,7 @@ export function AddSectionDialog({
                         <div
                           key={index}
                           className="rounded-lg border p-4 space-y-2 mb-3"
-                        > 
+                        >
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">
                               Location {index + 1}
@@ -773,9 +794,20 @@ export function AddSectionDialog({
                               {...register(`data.locations.${index}.address`)}
                               disabled={isSubmitting}
                             />
-                            <Input
-                              placeholder="Image URL (optional)"
-                              {...register(`data.locations.${index}.imageUrl`)}
+                            <ImageUpload
+                              label="Image (optional)"
+                              value={
+                                (watch(
+                                  `data.locations.${index}.imageUrl`
+                                ) as unknown as string | undefined) || undefined
+                              }
+                              onChange={(url) =>
+                                setValue(
+                                  `data.locations.${index}.imageUrl` as any,
+                                  url
+                                )
+                              }
+                              folder="locations"
                               disabled={isSubmitting}
                             />
                           </div>

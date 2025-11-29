@@ -13,8 +13,8 @@ if (!process.env.S3_SECRET_ACCESS_KEY) {
 }
 
 export const s3Client = new S3Client({
-    region: process.env.S3_REGION || "us-east-1",
     endpoint: process.env.S3_ENDPOINT,
+    region: process.env.S3_REGION || "auto", // "auto" works for Cloudflare R2, or specify region for AWS S3
     credentials: {
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,

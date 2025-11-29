@@ -23,11 +23,11 @@ Use a local MongoDB instance or a hosted MongoDB Atlas cluster. Set `MONGODB_URI
 
 Create a public bucket in your S3-compatible provider (e.g. `company-assets`) and configure:
 
-- `S3_ENDPOINT`
-- `S3_REGION`
-- `S3_ACCESS_KEY_ID`
-- `S3_SECRET_ACCESS_KEY`
-- `S3_PUBLIC_BASE_URL`
+- `S3_ENDPOINT` - Your storage endpoint URL
+- `S3_REGION` - **Optional**: Only required for AWS S3. Not needed for Cloudflare R2 (global service) or DigitalOcean Spaces
+- `S3_ACCESS_KEY_ID` - Your access key
+- `S3_SECRET_ACCESS_KEY` - Your secret key
+- `S3_PUBLIC_BASE_URL` - Public URL for accessing uploaded files
 
 ---
 
@@ -57,7 +57,8 @@ MONGODB_URI="mongodb://localhost:27017/careers-page"
 DATABASE_URL="mongodb://localhost:27017/careers-page"
 
 # S3 Storage
-S3_REGION=us-east-1
+# Note: S3_REGION is optional - not needed for Cloudflare R2 (global service)
+# S3_REGION=us-east-1  # Only required for AWS S3
 S3_ENDPOINT=https://your-s3-endpoint.example.com
 S3_ACCESS_KEY_ID=your_s3_access_key_id
 S3_SECRET_ACCESS_KEY=your_s3_secret_access_key

@@ -525,7 +525,7 @@ export function EditSectionDialog({
             <Input
               id="title"
               {...register("data.title", { required: "Title is required" })}
-              defaultValue={((section as any).data as any)?.title || ""}
+              defaultValue={((section as TypedSection).data as any).title || ""}
               disabled={isSubmitting}
             />
           </div>
