@@ -1,149 +1,206 @@
-# 🚀 Careers Page Builder
+# Careers Page Builder
 
-A modern, multi-tenant careers page builder that empowers companies to create beautiful, customizable careers pages with ease.
+a platform where companies can build and manage their own careers pages without dealing with code.
 
-## ✨ Features
+## what this is
 
-- 🎨 **Beautiful UI**: Built with shadcn/ui and Tailwind CSS v4
-- 🔐 **Secure Auth**: Google OAuth via NextAuth.js v5
-- 🏢 **Multi-Tenant**: Manage multiple companies with role-based access
-- 📄 **7 Section Types**: Hero, About, Values, Benefits, Culture Video, Team Locations, Jobs
-- 💼 **Job Listings**: Display and manage job openings
-- 📱 **Responsive**: Mobile-first design
-- ⚡ **Fast**: Built on Next.js 16 with App Router
-- 🎬 **Animated**: Smooth Framer Motion animations
-- 🔍 **SEO-Optimized**: Server-side rendering with metadata
-- 📦 **S3 Storage**: Generic S3-compatible API for file uploads
+full-stack careers platform with:
 
-## 🛠️ Tech Stack
+- multi-tenant setup, each company gets their own space
+- draft/publish workflow, edit safely, publish when ready
+- 7 customizable sections (hero, about, values, benefits, culture video, team locations, jobs)
+- job listings with 155+ sample jobs seeded
+- animated public pages with seo optimization
+- role-based access via google oauth
 
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Styling**: Tailwind CSS v4, shadcn/ui
-- **Database**: MongoDB (Mongoose)
-- **Authentication**: NextAuth.js v5
-- **Storage**: S3-compatible API (R2, S3, Spaces, etc.)
-- **Animations**: Framer Motion
-- **Forms**: React Hook Form + Zod
+## tech stack
 
-## 📦 What's Included
+- next.js 16 (app router), react 19, typescript
+- tailwind v4, shadcn/ui, framer motion
+- mongodb + mongoose
+- nextauth v5 (google oauth)
+- s3-compatible storage
+- react hook form + zod validation
 
-### Completed Features
+## getting started
 
-✅ **Authentication System**
+### what you need
 
-- Google OAuth login
-- Session management
-- Protected routes
+- node 18+ and pnpm
+- mongodb instance (local or atlas)
+- google oauth credentials
+- s3-compatible storage (aws s3, cloudflare r2, etc.)
 
-✅ **Dashboard**
+### setup
 
-- Company overview with stats
-- Company creation and management
-- Role-based access control
-
-✅ **Careers Page Builder**
-
-- 7 customizable section types
-- Draft/publish workflow
-- SEO settings
-- Preview functionality
-
-✅ **Public Careers Pages**
-
-- Beautiful, animated sections
-- Job listings integration
-- Responsive design
-- Server-side rendering
-
-✅ **Data Management**
-
-- 155 sample jobs (seeded from CSV)
-- Multi-tenant architecture
-- Proper data isolation
-
-## 🚦 Quick Start
-
-See [SETUP.md](./SETUP.md) for detailed setup instructions.
+1. clone and install
 
 ```bash
-# 1. Install dependencies
+git clone URL
+cd careers-page
 pnpm install
+```
 
-# 2. Set up environment variables
+2. configure environment
+
+```bash
 cp example.env .env.local
-# Edit .env.local with your credentials
+```
 
-# 3. Set up database
-pnpm prisma db push
-pnpm prisma db seed
+.ENV:
+- `MONGODB_URI`,
+- `NEXTAUTH_SECRET`, generate with `openssl rand -base64 32`,
+- `GOOGLE_CLIENT_ID`,
+- `GOOGLE_CLIENT_SECRET`,
+- `S3_*`, 
 
-# 4. Start development server
+3. seed the database
+```bash
+pnpm seed
+```
+creates a demo company with sample jobs and sections
+
+4. start dev server
+```bash
 pnpm dev
 ```
 
-## 📸 Demo
+visit http://localhost:3000
 
-Visit these URLs after setup:
+### quick test urls
 
-- **Home**: `http://localhost:3000`
-- **Dashboard**: `http://localhost:3000/dashboard`
-- **Builder**: `http://localhost:3000/demo-company/builder`
-- **Public Page**: `http://localhost:3000/demo-company`
+- home: http://localhost:3000
+- sign in: http://localhost:3000/auth/signin
+- dashboard: http://localhost:3000/dashboard
+- builder: http://localhost:3000/demo-company/builder
+- public page: http://localhost:3000/demo-company
 
-## 🗂️ Project Structure
+## how to use it
 
+### for admins/recruiters
+
+sign in
+- click sign in on homepage
+- use google oauth
+
+view dashboard
+- see company stats (sections, jobs, applications)
+- view all your companies
+- create new companies
+
+edit your careers page
+- click "edit page" on company card
+
+working in the builder
+- toggle sections on/off
+- drag to reorder
+- click edit on any section to modify content
+- available sections: hero, about, values, benefits, culture video, team locations, jobs
+
+preview changes
+- click "preview" to see draft version
+- only you can see draft changes
+- public sees published version
+
+publish
+- click "publish changes" when ready
+- goes live immediately
+
+seo settings
+- set page title and meta description
+- helps with search rankings
+
+### for candidates (public)
+
+visit careers page
+- go to `/{company-slug}` (like `/demo-company`)
+- no login needed
+
+browse
+- scroll through animated sections
+- learn about company culture, values, benefits
+- watch culture video if available
+
+view jobs
+- see all open positions
+- apply for a position
+
+
+## key features
+
+draft vs. live system
+- edit in draft mode without affecting public page
+- preview changes before publishing
+- one-click publish when ready
+
+multi-tenant
+- multiple companies on one platform
+- isolated workspaces
+- role-based permissions
+
+customizable sections
+- hero with headline, description, cta
+- about company
+- core values with icons
+- employee benefits
+- culture video (youtube embed)
+- team locations with images
+- jobs list (auto-pulls from job postings)
+
+job management
+- create and edit job postings
+- set location, type, salary range
+- publish/unpublish jobs
+- expiration dates
+
+application tracking
+- candidates submit applications
+- track application status
+
+## environment variables
+
+required in `.env`:
+
+```env
+# database
+MONGODB_URI=mongodb://localhost:27017/careers-page
+
+# auth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-here
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# storage
+S3_ENDPOINT=your-s3-endpoint
+S3_REGION=your-region
+S3_BUCKET=your-bucket-name
+S3_ACCESS_KEY_ID=your-access-key
+S3_SECRET_ACCESS_KEY=your-secret-key
 ```
-careers-page/
-├── app/                    # Next.js app directory
-│   ├── (auth)/            # Authentication pages
-│   ├── (dashboard)/       # Dashboard pages
-│   ├── (public)/          # Public careers pages
-│   └── api/               # API routes
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   ├── auth/             # Auth components
-│   ├── dashboard/        # Dashboard components
-│   ├── careers/          # Section renderers
-│   └── builder/          # Builder components
-├── lib/                   # Utilities and config
-│   ├── validations/      # Zod schemas
-│   └── ...
-├── prisma/               # Database schema and seed
-└── types/                # TypeScript types
+
+## scripts
+
+```bash
+pnpm dev          # start dev server
+pnpm build        # build for production
+pnpm start        # start production server
+pnpm seed         # seed database with demo data
+pnpm lint         # run linter
 ```
 
-## 🔐 Storage Setup
+## demo credentials
 
-This project uses a **generic S3-compatible API** for file storage (AWS S3, Cloudflare R2, DigitalOcean Spaces, etc.):
+after seeding, you can:
+- sign in with any google account
+- view demo company at `/demo-company`
+- access builder at `/demo-company/builder`
 
-- Uses AWS SDK v3
-- Public bucket for uploaded assets
-- Supports all standard S3 operations
+## future imporvement roadmap
 
-See [SETUP.md](./SETUP.md) for configuration details.
+- application status emails
+- analytics dashboard
+- resume upload to s3
+- applicant tracking system
+- interview scheduling
 
-## 🎯 Roadmap
-
-Current status: **MVP Complete** ✅
-
-Future enhancements:
-
-- [ ] Interactive section editing
-- [ ] Drag-and-drop section reordering
-- [ ] Jobs CRUD interface
-- [ ] Application submission form
-- [ ] Applications management
-- [ ] Advanced job filters
-- [ ] Analytics dashboard
-- [ ] Email notifications
-- [ ] Custom domains
-
-## 📝 License
-
-MIT
-
-## 🤝 Contributing
-
-Contributions welcome! Please feel free to submit a Pull Request.
-
----

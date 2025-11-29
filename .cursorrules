@@ -1,0 +1,83 @@
+You are an expert full-stack developer specializing in Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4.
+
+# Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Library**: React 19
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Animation**: Framer Motion
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: NextAuth.js v5 (Auth.js) with Google OAuth
+- **File Storage**: AWS S3 (via @aws-sdk/client-s3)
+- **UI**: shadcn/ui (Radix UI + Tailwind)
+- **Forms**: React Hook Form + Zod
+
+# Coding Guidelines
+
+## General
+
+- Use **TypeScript** for all code.
+- Prefer **Functional Components** with hooks.
+- Use **Server Components** by default. Only add `"use client"` when interactivity (state, effects, event listeners) is strictly required.
+- **Strict Mode**: Ensure no console errors or linter warnings.
+- Follow modern JavaScript/TypeScript best practices (ES6+).
+
+## Next.js & React
+
+- Use the **App Router** structure (`app/`).
+- Use **Server Actions** for data mutations.
+- Use `next/image` for optimized image rendering.
+- Use `next/link` for client-side navigation.
+- Implement `Suspense` boundaries for async data fetching components.
+- Utilize React 19 features (like `useActionState`, `useFormStatus`, etc.) where appropriate.
+
+## Styling (Tailwind CSS v4)
+
+- Use standard Tailwind utility classes.
+- Use `clsx` and `tailwind-merge` (via a `cn` helper) for conditional class names.
+- Ensure responsiveness using Tailwind's breakpoint prefixes (mobile-first approach).
+- Keep CSS variables for theming if applicable.
+
+## Animation (Framer Motion)
+
+- Use **Framer Motion** for complex animations and page transitions.
+- Prefer the `motion` component primitives (e.g., `motion.div`).
+- Use `AnimatePresence` for exit animations.
+- Keep animations performant; prefer transforming `opacity` and `transform`.
+
+## Database (MongoDB/Mongoose)
+
+- Define robust Mongoose schemas and models.
+- Ensure all database operations handle errors gracefully.
+- Use a singleton connection pattern for MongoDB to prevent connection exhaustion in serverless environments.
+
+## Authentication (NextAuth.js v5)
+
+- Use `auth.ts` for configuration (providers, callbacks, adapters).
+- Use the **MongoDB Adapter** for persistent session storage.
+- Implement **Google OAuth** as a primary provider.
+- Protect routes using Middleware or server-side session checks (`auth()`).
+
+## File Storage (AWS S3)
+
+- Use `@aws-sdk/client-s3` for file operations.
+- Store sensitive credentials (keys, bucket names, regions) in environment variables.
+- Generate signed URLs for secure file access/upload where appropriate, or proxy through API routes.
+
+## UI Components (shadcn/ui)
+
+- Reuse existing UI components whenever possible.
+- If a new primitive is needed, install it via shadcn CLI or create it following the same pattern (Radix UI + Tailwind).
+- Keep components small, focused, and composable.
+
+## Forms & Validation
+
+- Use **React Hook Form** for form state management.
+- Use **Zod** for schema validation (both client-side and server-side).
+
+## Architecture & patterns
+
+- Maintain a clear separation of concerns.
+- Colocate components with their routes if they are specific to that route, or in a shared `components/` directory if reusable.
+- Use environment variables for configuration.
