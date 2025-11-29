@@ -204,3 +204,5 @@ after seeding, you can:
 - applicant tracking system
 - interview scheduling
 
+# Rebuild the image and restart the container
+docker compose up -d --build

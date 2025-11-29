@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { PiPalette, PiBriefcase, PiRocket } from "react-icons/pi";
@@ -13,6 +13,18 @@ export default function AnimatedHomePage() {
     const [isLoginLoading, setIsLoginLoading] = useState(false);
     const [isDemoLoading, setIsDemoLoading] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        // Hide scrollbar on mount
+        document.documentElement.classList.add("hide-scrollbar");
+        document.body.classList.add("hide-scrollbar");
+
+        // Cleanup: remove class on unmount
+        return () => {
+            document.documentElement.classList.remove("hide-scrollbar");
+            document.body.classList.remove("hide-scrollbar");
+        };
+    }, []);
 
     const handleLoginClick = () => {
         setIsLoginLoading(true);
