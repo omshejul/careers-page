@@ -24,7 +24,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { PiSpinner } from "react-icons/pi";
+import { PiSpinner, PiSparkle } from "react-icons/pi";
+import { faker } from "@faker-js/faker";
+import { motion } from "framer-motion";
 
 interface JobFormProps {
   companyId: string;
@@ -43,6 +45,7 @@ export function JobForm({
 }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const {
     register,
@@ -85,6 +88,131 @@ export function JobForm({
     }
   }, [title, isEdit, setValue]);
 
+  // Generate random job data
+  const generateRandomData = async () => {
+    setIsGenerating(true);
+
+    // Add a small delay for animation effect
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const jobTitles = [
+      "Senior Software Engineer",
+      "Full Stack Developer",
+      "Product Manager",
+      "UX Designer",
+      "Data Scientist",
+      "DevOps Engineer",
+      "Frontend Developer",
+      "Backend Developer",
+      "Mobile App Developer",
+      "QA Engineer",
+      "Technical Lead",
+      "Software Architect",
+      "Machine Learning Engineer",
+      "Cloud Engineer",
+      "Security Engineer",
+    ];
+
+    const departments = [
+      "Engineering",
+      "Product",
+      "Design",
+      "Data Science",
+      "Operations",
+      "Marketing",
+      "Sales",
+      "Customer Success",
+    ];
+
+    const employmentTypes = [
+      "Full-time",
+      "Part-time",
+      "Contract",
+      "Internship",
+    ];
+    const jobTypes = ["Remote", "Hybrid", "On-site"];
+    const experienceLevels = [
+      "Entry Level",
+      "Mid Level",
+      "Senior Level",
+      "Executive",
+    ];
+    const workPolicies = [
+      "Remote-first",
+      "Hybrid-flexible",
+      "Office-based",
+      "Fully remote",
+    ];
+
+    const randomTitle = faker.helpers.arrayElement(jobTitles);
+    const randomSlug = generateSlug(randomTitle);
+    const randomDepartment = faker.helpers.arrayElement(departments);
+    const randomLocation = `${faker.location.city()}, ${faker.location.state({
+      abbreviated: true,
+    })}`;
+    const randomEmploymentType = faker.helpers.arrayElement(employmentTypes);
+    const randomJobType = faker.helpers.arrayElement(jobTypes);
+    const randomExperienceLevel = faker.helpers.arrayElement(experienceLevels);
+    const randomWorkPolicy = faker.helpers.arrayElement(workPolicies);
+
+    // Generate realistic salary range
+    const minSalary = faker.number.int({ min: 60, max: 200 });
+    const maxSalary = minSalary + faker.number.int({ min: 20, max: 80 });
+    const salaryRange = `$${minSalary},000 - $${maxSalary},000`;
+
+    // Generate realistic job description
+    const description = `## About the Role
+
+We are looking for a talented ${randomTitle} to join our ${randomDepartment} team. This is an exciting opportunity to work on cutting-edge projects and make a significant impact.
+
+## Responsibilities
+
+${faker.lorem.paragraphs(3, "\n\n")}
+
+## Requirements
+
+- ${faker.lorem.sentence()}
+- ${faker.lorem.sentence()}
+- ${faker.lorem.sentence()}
+- ${faker.lorem.sentence()}
+
+## Benefits
+
+- Competitive salary and equity package
+- Comprehensive health, dental, and vision insurance
+- Flexible work arrangements
+- Professional development opportunities
+- ${faker.lorem.sentence()}
+
+## How to Apply
+
+${faker.lorem.paragraph()}`;
+
+    // Generate expiration date (30-90 days from now)
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() + faker.number.int({ min: 30, max: 90 })
+    );
+    const expiresAtString = expiresAt.toISOString().slice(0, 16);
+
+    // Fill all form fields
+    setValue("title", randomTitle);
+    setValue("slug", randomSlug);
+    setValue("description", description);
+    setValue("department", randomDepartment);
+    setValue("location", randomLocation);
+    setValue("employmentType", randomEmploymentType);
+    setValue("jobType", randomJobType);
+    setValue("experienceLevel", randomExperienceLevel);
+    setValue("workPolicy", randomWorkPolicy);
+    setValue("salaryRange", salaryRange);
+    setValue("expiresAt", expiresAtString);
+    setValue("published", faker.datatype.boolean({ probability: 0.8 }));
+
+    setIsGenerating(false);
+    toast.success("Random job data generated!");
+  };
+
   const onSubmit = async (data: CreateJobInput) => {
     setIsSubmitting(true);
     try {
@@ -94,11 +222,19 @@ export function JobForm({
 
       const method = isEdit ? "PATCH" : "POST";
 
+      // Convert datetime-local format to ISO string
+      let expiresAtISO: string | undefined = undefined;
+      if (data.expiresAt && data.expiresAt.trim() !== "") {
+        // datetime-local format is YYYY-MM-DDTHH:mm, need to convert to ISO
+        const date = new Date(data.expiresAt);
+        if (!isNaN(date.getTime())) {
+          expiresAtISO = date.toISOString();
+        }
+      }
+
       const body: any = {
         ...data,
-        expiresAt: data.expiresAt
-          ? new Date(data.expiresAt).toISOString()
-          : undefined,
+        expiresAt: expiresAtISO,
       };
 
       const response = await fetch(url, {
@@ -131,6 +267,36 @@ export function JobForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex-1" />
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          animate={isGenerating ? { rotate: [0, 10, -10, 10, -10, 0] } : {}}
+          transition={{ duration: 0.3 }}
+        >
+          <Button
+            type="button"
+            variant="outline"
+            onClick={generateRandomData}
+            disabled={isGenerating || isSubmitting}
+            className="gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <PiSpinner className="h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <PiSparkle className="h-4 w-4" />
+                Generate Random Data
+              </>
+            )}
+          </Button>
+        </motion.div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="title">

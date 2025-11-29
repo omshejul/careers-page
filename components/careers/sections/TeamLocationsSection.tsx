@@ -40,7 +40,7 @@ export function TeamLocationsSection({ section }: TeamLocationsSectionProps) {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="h-full overflow-hidden">
+              <Card className="h-full overflow-hidden pt-0 gap-1">
                 {location.imageUrl && (
                   <div className="relative h-48 w-full">
                     <Image
@@ -51,15 +51,15 @@ export function TeamLocationsSection({ section }: TeamLocationsSectionProps) {
                     />
                   </div>
                 )}
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="pt-6 gap-1">
+                  <CardTitle className="flex items-center gap-1">
                     <PiMapPin className="h-5 w-5 text-primary" />
                     {location.city}
                   </CardTitle>
                   <CardDescription>{location.country}</CardDescription>
                 </CardHeader>
                 {location.address && (
-                  <CardContent>
+                  <CardContent className="pb-3">
                     <p className="text-sm text-muted-foreground">
                       {location.address}
                     </p>

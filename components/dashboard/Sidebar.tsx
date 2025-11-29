@@ -9,6 +9,7 @@ import {
   PiFileText,
   PiGear,
   PiBuildings,
+  PiArrowLeft,
 } from "react-icons/pi";
 
 interface SidebarProps {
@@ -37,9 +38,9 @@ export function Sidebar({
   const companyNavItems = companySlug
     ? [
         {
-          title: "Dashboard",
+          title: "Back to Dashboard",
           href: "/dashboard",
-          icon: PiSquaresFour,
+          icon: PiArrowLeft,
         },
         {
           title: "Overview",

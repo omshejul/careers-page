@@ -44,7 +44,7 @@ export async function GET(
       .populate('companyId')
       .lean()
 
-    if (!careersPage) {
+    if (!careersPage || Array.isArray(careersPage)) {
       return NextResponse.json(
         { error: 'Careers page not found' },
         { status: 404 }

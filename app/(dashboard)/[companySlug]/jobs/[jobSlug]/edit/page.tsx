@@ -15,10 +15,10 @@ import type { IJob } from "@/models/Job";
 export default async function EditJobPage({
   params,
 }: {
-  params: Promise<{ companySlug: string; jobId: string }>;
+  params: Promise<{ companySlug: string; jobSlug: string }>;
 }) {
   await connectDB();
-  const { companySlug, jobId } = await params;
+  const { companySlug, jobSlug } = await params;
   const session = await auth();
 
   if (!session?.user) {
@@ -48,9 +48,9 @@ export default async function EditJobPage({
     redirect(`/${companySlug}/jobs`);
   }
 
-  // Get job
+  // Get job by slug
   const jobDoc = await Job.findOne({
-    _id: jobId,
+    slug: jobSlug,
     companyId: company._id,
   });
 
@@ -101,7 +101,7 @@ export default async function EditJobPage({
             companySlug={companySlug}
             initialData={jobData}
             isEdit={true}
-            jobId={jobId}
+            jobId={job._id.toString()}
           />
         </CardContent>
       </Card>

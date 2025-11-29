@@ -1,6 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { connectDB, Company, CompanyUser, Job } from "@/lib/db";
+import {
+  connectDB,
+  Company,
+  CompanyUser,
+  Job,
+  CareersPage,
+  Section,
+} from "@/lib/db";
 import mongoose from "mongoose";
 import { JobsClient } from "@/components/jobs/JobsClient";
 
@@ -40,6 +47,15 @@ export default async function JobsPage({
     .sort({ postedAt: -1 })
     .lean();
 
+  // Check if JOBS_LIST section exists in the careers page
+  const careersPage = await CareersPage.findOne({ companyId: company._id });
+  const hasJobsListSection = careersPage
+    ? (await Section.findOne({
+        careersPageId: careersPage._id,
+        type: "JOBS_LIST",
+      })) !== null
+    : false;
+
   const serializedJobs = jobs.map((job: any) => ({
     id: job._id.toString(),
     title: job.title,
@@ -65,7 +81,7 @@ export default async function JobsPage({
       companySlug={companySlug}
       initialJobs={serializedJobs}
       userRole={companyUser.role}
+      hasJobsListSection={hasJobsListSection}
     />
   );
 }
-

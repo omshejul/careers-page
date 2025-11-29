@@ -11,7 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PiPlus, PiPencil, PiTrash, PiEye } from "react-icons/pi";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PiPlus, PiPencil, PiTrash, PiEye, PiWarning } from "react-icons/pi";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -33,6 +34,7 @@ interface JobsClientProps {
   companySlug: string;
   initialJobs: Job[];
   userRole: string;
+  hasJobsListSection: boolean;
 }
 
 export function JobsClient({
@@ -40,6 +42,7 @@ export function JobsClient({
   companySlug,
   initialJobs,
   userRole,
+  hasJobsListSection,
 }: JobsClientProps) {
   const router = useRouter();
   const [jobs, setJobs] = useState(initialJobs);
@@ -98,6 +101,30 @@ export function JobsClient({
         )}
       </div>
 
+      {jobs.length > 0 && !hasJobsListSection && (
+        <Alert
+          variant="default"
+          className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20"
+        >
+          <PiWarning className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+          <AlertTitle className="text-yellow-800 dark:text-yellow-200">
+            Jobs List Section Missing
+          </AlertTitle>
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300 flex flex-col gap-2">
+            <span>
+              You have {jobs.length} job{jobs.length !== 1 ? "s" : ""} posted, but
+              the Jobs List section hasn't been added to your careers page builder
+              yet. Add it to display your jobs on the public careers page.
+            </span>
+            <Button asChild size="sm" className="w-fit bg-yellow-600 hover:bg-yellow-700 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700">
+              <Link href={`/${companySlug}/builder`}>
+                Go to Builder
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {jobs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -145,7 +172,7 @@ export function JobsClient({
                     {canEdit && (
                       <>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/${companySlug}/jobs/${job.id}/edit`}>
+                          <Link href={`/${companySlug}/jobs/${job.slug}/edit`}>
                             <PiPencil className="h-4 w-4" />
                           </Link>
                         </Button>

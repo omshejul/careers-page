@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
 export const createApplicationSchema = z.object({
-  jobId: z.string().cuid('Invalid job ID'),
+  jobId: z.string().min(1, 'Job ID is required'),
   firstName: z.string().min(1, 'First name is required').max(100),
   lastName: z.string().min(1, 'Last name is required').max(100),
-  email: z.string().email('Invalid email address'),
+  email: z.email('Invalid email address'),
   phone: z.string().max(20).optional(),
-  resumeUrl: z.string().url('Invalid resume URL').min(1, 'Resume is required'),
+  resumeUrl: z.url('Invalid resume URL').min(1, 'Resume is required'),
   coverLetter: z.string().max(5000).optional(),
   linkedinUrl: z.string().url('Invalid LinkedIn URL').optional().or(z.literal('')),
   portfolioUrl: z.string().url('Invalid portfolio URL').optional().or(z.literal('')),

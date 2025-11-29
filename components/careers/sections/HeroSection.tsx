@@ -90,13 +90,11 @@ export function HeroSection({
             </Button>
           </motion.div>
         ) : (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="mx-auto max-w-2xl"
-          >
-            <div
+          <div className="mx-auto max-w-2xl">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
               className="flex items-center gap-4 rounded-2xl px-6 py-4"
               style={{
                 background: primaryColor
@@ -112,6 +110,7 @@ export function HeroSection({
                   ? `1px solid ${primaryColor}80`
                   : "1px solid rgba(255,255,255,0.1)",
                 backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
               }}
             >
               <div
@@ -151,8 +150,8 @@ export function HeroSection({
                   opportunities!
                 </p>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </div>
     </motion.section>
