@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
 export interface IJob extends Document {
-  _id: string
   companyId: mongoose.Types.ObjectId
   title: string
   slug: string
