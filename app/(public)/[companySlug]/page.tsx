@@ -112,11 +112,22 @@ export default async function PublicCareersPage({
     company: serializedCompany,
   }));
 
+  // Filter out HERO section for alternating background calculation
+  // HERO always has its own background (image), so we start alternating from the next section
+  const nonHeroSections = serializedSections.filter(
+    (s: any) => s.type !== "HERO"
+  );
+
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex-1">
         {serializedSections.map((section) => {
           const typedSection = section as unknown as TypedSection;
+          // Calculate index among non-hero sections for alternating backgrounds
+          const nonHeroIndex = nonHeroSections.findIndex(
+            (s: any) => s.id === section.id
+          );
+          const isAltBackground = nonHeroIndex % 2 === 1;
 
           switch (typedSection.type) {
             case "HERO":
@@ -130,20 +141,44 @@ export default async function PublicCareersPage({
                 />
               );
             case "ABOUT":
-              return <AboutSection key={section.id} section={typedSection} />;
+              return (
+                <AboutSection
+                  key={section.id}
+                  section={typedSection}
+                  isAltBackground={isAltBackground}
+                />
+              );
             case "VALUES":
-              return <ValuesSection key={section.id} section={typedSection} />;
+              return (
+                <ValuesSection
+                  key={section.id}
+                  section={typedSection}
+                  isAltBackground={isAltBackground}
+                />
+              );
             case "BENEFITS":
               return (
-                <BenefitsSection key={section.id} section={typedSection} />
+                <BenefitsSection
+                  key={section.id}
+                  section={typedSection}
+                  isAltBackground={isAltBackground}
+                />
               );
             case "CULTURE_VIDEO":
               return (
-                <CultureVideoSection key={section.id} section={typedSection} />
+                <CultureVideoSection
+                  key={section.id}
+                  section={typedSection}
+                  isAltBackground={isAltBackground}
+                />
               );
             case "TEAM_LOCATIONS":
               return (
-                <TeamLocationsSection key={section.id} section={typedSection} />
+                <TeamLocationsSection
+                  key={section.id}
+                  section={typedSection}
+                  isAltBackground={isAltBackground}
+                />
               );
             case "JOBS_LIST":
               return (
@@ -152,6 +187,7 @@ export default async function PublicCareersPage({
                   section={typedSection}
                   jobs={serializedJobs}
                   companySlug={companySlug}
+                  isAltBackground={isAltBackground}
                 />
               );
             default:
