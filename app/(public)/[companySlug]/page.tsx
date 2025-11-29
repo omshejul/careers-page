@@ -8,6 +8,7 @@ import {
   CompanyUser,
 } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import mongoose from "mongoose";
 import { TypedSection } from "@/types/section";
 import {
   HeroSection,
@@ -96,7 +97,7 @@ export default async function PublicCareersPage({
     // Verify user has access to this company
     const hasAccess = await CompanyUser.findOne({
       companyId: company._id,
-      userId: session.user.id,
+      userId: new mongoose.Types.ObjectId(session.user.id),
     });
     if (!hasAccess) {
       notFound();

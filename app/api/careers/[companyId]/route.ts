@@ -108,8 +108,6 @@ export async function PATCH(
     const body = await request.json()
     const validatedData = updateCareersPageSchema.parse(body)
 
-    let publishCompleteTime: Date | null = null
-
     // If publishing, copy all sections' data to publishedData
     if (validatedData.published === true) {
       const existingCareersPage = await CareersPage.findOne({ companyId })
@@ -119,14 +117,6 @@ export async function PATCH(
           { careersPageId: existingCareersPage._id },
           [{ $set: { publishedData: '$data' } }]
         )
-
-        // Get the timestamp from MongoDB directly (from the section we just updated)
-        // This avoids clock skew issues between Node.js and MongoDB servers
-        const latestUpdatedSection = await Section.findOne(
-          { careersPageId: existingCareersPage._id }
-        ).sort({ updatedAt: -1 }).select('updatedAt').lean() as { updatedAt?: Date } | null
-
-        publishCompleteTime = latestUpdatedSection?.updatedAt || new Date()
 
         // Clear the unpublished changes flag
         validatedData.hasUnpublishedChanges = false
@@ -146,31 +136,13 @@ export async function PATCH(
       )
     }
 
-    // Final consistency check: if any section was modified AFTER our publish completed
-    // (by a concurrent request), re-set the flag to true
-    if (publishCompleteTime) {
-      const concurrentlyModified = await Section.countDocuments({
-        careersPageId: careersPage._id,
-        updatedAt: { $gt: publishCompleteTime }
-      })
-
-      if (concurrentlyModified > 0) {
-        await CareersPage.findByIdAndUpdate(careersPage._id, {
-          hasUnpublishedChanges: true
-        })
-      }
-    }
-
     const sections = await Section.find({ careersPageId: careersPage._id })
       .sort({ order: 'asc' })
       .lean()
 
-    // Re-fetch the careers page to get the latest hasUnpublishedChanges value
-    const updatedCareersPage = await CareersPage.findById(careersPage._id)
-
     return NextResponse.json({
       data: {
-        ...(updatedCareersPage?.toObject() || careersPage.toObject()),
+        ...careersPage.toObject(),
         id: careersPage._id.toString(),
         sections: sections.map((s: any) => ({
           ...s,

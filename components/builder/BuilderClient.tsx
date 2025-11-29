@@ -236,10 +236,14 @@ export function BuilderClient({
   const router = useRouter();
   const [sections, setSections] = useState(initialSections);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isDiscarding, setIsDiscarding] = useState(false);
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [editSection, setEditSection] = useState<TypedSection | null>(null);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(
+    careersPage.hasUnpublishedChanges
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -252,6 +256,10 @@ export function BuilderClient({
   useEffect(() => {
     setSections(initialSections);
   }, [initialSections]);
+
+  useEffect(() => {
+    setHasUnpublishedChanges(careersPage.hasUnpublishedChanges);
+  }, [careersPage.hasUnpublishedChanges]);
 
   const handlePublish = async () => {
     setIsPublishing(true);
@@ -269,6 +277,7 @@ export function BuilderClient({
       }
 
       toast.success("Careers page published successfully!");
+      setHasUnpublishedChanges(false);
       router.refresh();
     } catch (error) {
       console.error("Error publishing:", error);
@@ -279,6 +288,41 @@ export function BuilderClient({
       );
     } finally {
       setIsPublishing(false);
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDiscardChanges = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to discard all unpublished changes? This will revert to the last published version and cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    setIsDiscarding(true);
+    setIsSyncing(true);
+    try {
+      const response = await fetch(`/api/careers/${companyId}/discard`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to discard changes");
+      }
+
+      toast.success("Changes discarded successfully");
+      setHasUnpublishedChanges(false);
+      router.refresh();
+    } catch (error) {
+      console.error("Error discarding changes:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to discard changes"
+      );
+    } finally {
+      setIsDiscarding(false);
       setIsSyncing(false);
     }
   };
@@ -304,6 +348,7 @@ export function BuilderClient({
 
       toast.success("Section deleted successfully");
       setSections(sections.filter((s) => s.id !== sectionId));
+      setHasUnpublishedChanges(true);
       router.refresh();
     } catch (error) {
       console.error("Error deleting section:", error);
@@ -338,6 +383,7 @@ export function BuilderClient({
 
         await Promise.all(updatePromises);
         toast.success("Sections reordered successfully");
+        setHasUnpublishedChanges(true);
         router.refresh();
       } catch (error) {
         console.error("Error reordering sections:", error);
@@ -369,6 +415,7 @@ export function BuilderClient({
           updatedAt: s.updatedAt,
         }));
         setSections(serializedSections);
+        setHasUnpublishedChanges(true);
       }
     } catch (error) {
       console.error("Error fetching sections:", error);
@@ -397,6 +444,7 @@ export function BuilderClient({
           updatedAt: s.updatedAt,
         }));
         setSections(serializedSections);
+        setHasUnpublishedChanges(true);
       }
     } catch (error) {
       console.error("Error fetching sections:", error);
@@ -454,8 +502,20 @@ export function BuilderClient({
                 Preview
               </a>
             </Button>
-            {(!careersPage.published || careersPage.hasUnpublishedChanges) && (
-              <Button onClick={handlePublish} disabled={isPublishing}>
+            {careersPage.published && hasUnpublishedChanges && (
+              <Button
+                variant="destructive"
+                onClick={handleDiscardChanges}
+                disabled={isDiscarding || isPublishing}
+              >
+                {isDiscarding ? "Discarding..." : "Discard Changes"}
+              </Button>
+            )}
+            {(!careersPage.published || hasUnpublishedChanges) && (
+              <Button
+                onClick={handlePublish}
+                disabled={isPublishing || isDiscarding}
+              >
                 <PiGlobe className="mr-1 h-4 w-4" />
                 {isPublishing
                   ? "Publishing..."
@@ -472,7 +532,7 @@ export function BuilderClient({
           <span className="text-sm text-muted-foreground">Status:</span>
           {!careersPage.published ? (
             <Badge variant="secondary">Draft</Badge>
-          ) : careersPage.hasUnpublishedChanges ? (
+          ) : hasUnpublishedChanges ? (
             <Badge
               variant="outline"
               className="border-amber-500 bg-amber-50 text-amber-700"
