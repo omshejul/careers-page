@@ -138,6 +138,7 @@ export default async function PublicCareersPage({
                   hasJobs={serializedJobs.length > 0}
                   primaryColor={serializedCompany.primaryColor}
                   brandBannerUrl={serializedCompany.brandBannerUrl}
+                  companyLogo={serializedCompany.logo}
                 />
               );
             case "ABOUT":

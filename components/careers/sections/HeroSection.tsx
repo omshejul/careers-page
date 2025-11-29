@@ -10,6 +10,7 @@ interface HeroSectionProps {
   hasJobs?: boolean;
   primaryColor?: string;
   brandBannerUrl?: string;
+  companyLogo?: string;
 }
 
 export function HeroSection({
@@ -17,6 +18,7 @@ export function HeroSection({
   hasJobs = false,
   primaryColor,
   brandBannerUrl,
+  companyLogo,
 }: HeroSectionProps) {
   const { title, tagline, bannerUrl } = section.data;
 
@@ -46,6 +48,22 @@ export function HeroSection({
       <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/30" />
 
       <div className="container mx-auto relative z-10 px-4 text-center text-white max-w-7xl">
+        {companyLogo && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="mb-6 flex justify-center"
+          >
+            <div className="relative inline-flex items-center justify-center rounded-md bg-background p-3">
+              <img
+                src={companyLogo}
+                alt="Company Logo"
+                className="h-16 w-auto max-w-[200px] object-contain sm:h-20 md:h-24"
+              />
+            </div>
+          </motion.div>
+        )}
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
