@@ -45,7 +45,7 @@ export function HeroSection({
       {/* Overlay for better text visibility */}
       <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/30" />
 
-      <div className="container relative z-10 px-4 text-center text-white">
+      <div className="container mx-auto relative z-10 px-4 text-center text-white max-w-7xl">
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

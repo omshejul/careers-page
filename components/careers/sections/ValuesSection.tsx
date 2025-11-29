@@ -1,19 +1,25 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { ValuesSection as ValuesSectionType } from '@/types/section'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { motion } from "framer-motion";
+import { ValuesSection as ValuesSectionType } from "@/types/section";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ValuesSectionProps {
-  section: ValuesSectionType
+  section: ValuesSectionType;
 }
 
 export function ValuesSection({ section }: ValuesSectionProps) {
-  const { title, values } = section.data
+  const { title, values } = section.data;
 
   return (
     <section className="bg-muted/50 py-16">
-      <div className="container px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -50,5 +56,5 @@ export function ValuesSection({ section }: ValuesSectionProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

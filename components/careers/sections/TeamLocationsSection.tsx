@@ -1,21 +1,27 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { TeamLocationsSection as TeamLocationsSectionType } from '@/types/section'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { PiMapPin } from 'react-icons/pi'
-import Image from 'next/image'
+import { motion } from "framer-motion";
+import { TeamLocationsSection as TeamLocationsSectionType } from "@/types/section";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PiMapPin } from "react-icons/pi";
+import Image from "next/image";
 
 interface TeamLocationsSectionProps {
-  section: TeamLocationsSectionType
+  section: TeamLocationsSectionType;
 }
 
 export function TeamLocationsSection({ section }: TeamLocationsSectionProps) {
-  const { title, locations } = section.data
+  const { title, locations } = section.data;
 
   return (
     <section className="py-16">
-      <div className="container px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -65,5 +71,5 @@ export function TeamLocationsSection({ section }: TeamLocationsSectionProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

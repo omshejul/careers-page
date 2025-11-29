@@ -295,7 +295,7 @@ export function JobsListSection({
 
   return (
     <section id="jobs-section" className="bg-muted/50 py-16">
-      <div className="container px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

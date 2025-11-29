@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { AboutSection as AboutSectionType } from '@/types/section'
+import { motion } from "framer-motion";
+import { AboutSection as AboutSectionType } from "@/types/section";
 
 interface AboutSectionProps {
-  section: AboutSectionType
+  section: AboutSectionType;
 }
 
 export function AboutSection({ section }: AboutSectionProps) {
-  const { title, content } = section.data
+  const { title, content } = section.data;
 
   return (
     <motion.section
@@ -18,7 +18,7 @@ export function AboutSection({ section }: AboutSectionProps) {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <div className="container px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <h2 className="mb-8 text-center text-3xl font-bold md:text-4xl">
           {title}
         </h2>
@@ -29,5 +29,5 @@ export function AboutSection({ section }: AboutSectionProps) {
         </div>
       </div>
     </motion.section>
-  )
+  );
 }

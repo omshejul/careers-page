@@ -1,19 +1,25 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { BenefitsSection as BenefitsSectionType } from '@/types/section'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { motion } from "framer-motion";
+import { BenefitsSection as BenefitsSectionType } from "@/types/section";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface BenefitsSectionProps {
-  section: BenefitsSectionType
+  section: BenefitsSectionType;
 }
 
 export function BenefitsSection({ section }: BenefitsSectionProps) {
-  const { title, benefits } = section.data
+  const { title, benefits } = section.data;
 
   return (
     <section className="py-16">
-      <div className="container px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -48,5 +54,5 @@ export function BenefitsSection({ section }: BenefitsSectionProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }
