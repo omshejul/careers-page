@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { HeroSection as HeroSectionType } from "@/types/section";
 import { Button } from "@/components/ui/button";
 import { PiArrowDown, PiBriefcase } from "react-icons/pi";
+import GridDistortion from "@/components/GridDistortion";
 
 interface HeroSectionProps {
   section: HeroSectionType;
@@ -21,6 +22,8 @@ export function HeroSection({
   companyLogo,
 }: HeroSectionProps) {
   const { title, tagline, bannerUrl } = section.data;
+  const backgroundImage = brandBannerUrl || bannerUrl;
+  const hasBackgroundImage = Boolean(backgroundImage);
 
   const scrollToJobs = () => {
     const jobsSection = document.getElementById("jobs-section");
@@ -35,17 +38,28 @@ export function HeroSection({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="relative flex min-h-[500px] items-center justify-center overflow-hidden"
-      style={{
-        backgroundImage:
-          brandBannerUrl || bannerUrl
-            ? `url(${brandBannerUrl || bannerUrl})`
-            : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
     >
-      {/* Overlay for better text visibility */}
-      <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/30" />
+      <div className="absolute inset-0 -z-10">
+        {hasBackgroundImage ? (
+          <>
+            <div
+              style={{ width: "100%", height: "100%", position: "relative" }}
+            >
+              <GridDistortion
+                imageSrc={backgroundImage as string}
+                grid={12}
+                mouse={0.12}
+                strength={0.18}
+                relaxation={0.88}
+                className="h-full w-full"
+              />
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-black/55" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900" />
+        )}
+      </div>
 
       <div className="container mx-auto relative z-10 px-4 text-center text-white max-w-7xl">
         {companyLogo && (

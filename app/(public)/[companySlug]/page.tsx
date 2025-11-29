@@ -147,10 +147,10 @@ export default async function PublicCareersPage({
         : section.publishedData ?? section.data;
 
       return {
-        ...section,
+    ...section,
         data: sectionData,
-        id: section._id.toString(),
-        careersPageId: section.careersPageId.toString(),
+    id: section._id.toString(),
+    careersPageId: section.careersPageId.toString(),
         _id: undefined,
       };
     });

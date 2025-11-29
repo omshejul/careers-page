@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { PiPalette, PiBriefcase, PiRocket } from "react-icons/pi";
 import ColorBends from "@/components/ColorBends";
 
-
 export default async function HomePage() {
   const session = await auth();
 
@@ -21,7 +20,7 @@ export default async function HomePage() {
           colors={["#ff0000", "#00ff00", "#0000ff"]}
           rotation={30}
           speed={0.3}
-          scale={1.2}
+          scale={1.3}
           frequency={1.4}
           warpStrength={1.2}
           mouseInfluence={0.8}
