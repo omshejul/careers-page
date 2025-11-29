@@ -118,10 +118,10 @@ export function SettingsClient({
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Manage your company information and preferences
         </p>
       </div>
@@ -134,13 +134,14 @@ export function SettingsClient({
               Update your company details and branding
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name">Company Name *</Label>
               <Input
                 id="name"
                 {...register("name", { required: "Company name is required" })}
                 disabled={isSubmitting}
+                className="w-full"
               />
               {errors.name && (
                 <p className="text-sm text-destructive">
@@ -156,6 +157,7 @@ export function SettingsClient({
                 {...register("slug", { required: "Slug is required" })}
                 disabled={isSubmitting}
                 placeholder="company-name"
+                className="w-full"
               />
               <p className="text-xs text-muted-foreground">
                 Your careers page will be available at /{companySlug}
@@ -175,6 +177,7 @@ export function SettingsClient({
                 rows={4}
                 disabled={isSubmitting}
                 placeholder="Tell us about your company..."
+                className="w-full resize-none"
               />
             </div>
 
@@ -186,6 +189,7 @@ export function SettingsClient({
                 {...register("website")}
                 disabled={isSubmitting}
                 placeholder="https://example.com"
+                className="w-full"
               />
             </div>
 
@@ -197,17 +201,18 @@ export function SettingsClient({
                 {...register("logo")}
                 disabled={isSubmitting}
                 placeholder="https://example.com/logo.png"
+                className="w-full"
               />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="primaryColor">Primary Brand Color</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="primaryColor"
                     type="color"
-                    className="h-9 w-12 p-1"
+                    className="h-10 w-14 sm:h-9 sm:w-12 p-1 flex-shrink-0"
                     {...register("primaryColor")}
                     disabled={isSubmitting}
                   />
@@ -216,6 +221,7 @@ export function SettingsClient({
                     placeholder="#0F172A"
                     {...register("primaryColor")}
                     disabled={isSubmitting}
+                    className="flex-1"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -229,7 +235,7 @@ export function SettingsClient({
                   <Input
                     id="secondaryColor"
                     type="color"
-                    className="h-9 w-12 p-1"
+                    className="h-10 w-14 sm:h-9 sm:w-12 p-1 flex-shrink-0"
                     {...register("secondaryColor")}
                     disabled={isSubmitting}
                   />
@@ -238,6 +244,7 @@ export function SettingsClient({
                     placeholder="#38BDF8"
                     {...register("secondaryColor")}
                     disabled={isSubmitting}
+                    className="flex-1"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -254,6 +261,7 @@ export function SettingsClient({
                 {...register("brandBannerUrl")}
                 disabled={isSubmitting}
                 placeholder="https://example.com/hero-banner.jpg"
+                className="w-full"
               />
               <p className="text-xs text-muted-foreground">
                 Used as the default background image for the hero section on
@@ -261,7 +269,7 @@ export function SettingsClient({
               </p>
             </div>
 
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </CardContent>
@@ -271,16 +279,16 @@ export function SettingsClient({
       {/* Danger Zone */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">Danger Zone</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-destructive text-lg sm:text-xl">Danger Zone</CardTitle>
+          <CardDescription className="text-sm">
             Irreversible and destructive actions
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-0.5 flex-1">
               <h3 className="text-sm font-semibold">Delete Company</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Once you delete a company, there is no going back. This will
                 permanently delete the company, all jobs, applications, and
                 careers page data.
@@ -291,24 +299,24 @@ export function SettingsClient({
               onOpenChange={setDeleteDialogOpen}
             >
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isDeleting}>
+                <Button variant="destructive" disabled={isDeleting} className="w-full sm:w-auto">
                   <PiTrash className="mr-2 h-4 w-4" />
                   Delete Company
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center gap-2">
-                    <PiWarning className="h-5 w-5 text-destructive" />
+                  <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <PiWarning className="h-5 w-5 text-destructive flex-shrink-0" />
                     Are you absolutely sure?
                   </AlertDialogTitle>
                   <div className="pt-2 space-y-2">
-                    <AlertDialogDescription>
+                    <AlertDialogDescription className="text-sm">
                       This action cannot be undone. This will permanently delete
                       the company <strong>{company.name}</strong> and all of its
                       data including:
                     </AlertDialogDescription>
-                    <ul className="ml-4 list-disc space-y-1 text-sm text-muted-foreground">
+                    <ul className="ml-4 list-disc space-y-1 text-xs sm:text-sm text-muted-foreground">
                       <li>All job postings</li>
                       <li>All job applications</li>
                       <li>Careers page and all sections</li>
@@ -316,14 +324,14 @@ export function SettingsClient({
                     </ul>
                   </div>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel disabled={isDeleting}>
+                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                  <AlertDialogCancel disabled={isDeleting} className="w-full sm:w-auto">
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto"
                   >
                     {isDeleting ? "Deleting..." : "Delete Company"}
                   </AlertDialogAction>

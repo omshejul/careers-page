@@ -110,8 +110,9 @@ function getSectionDescription(section: TypedSection): string {
       return data.tagline || "Hero section with title and banner";
     case "ABOUT":
       return data.content
-        ? `${data.content.substring(0, 100)}${data.content.length > 100 ? "..." : ""
-        }`
+        ? `${data.content.substring(0, 100)}${
+            data.content.length > 100 ? "..." : ""
+          }`
         : "About section content";
     case "VALUES":
       return data.values?.length
@@ -119,15 +120,17 @@ function getSectionDescription(section: TypedSection): string {
         : "No values added";
     case "BENEFITS":
       return data.benefits?.length
-        ? `${data.benefits.length} benefit${data.benefits.length > 1 ? "s" : ""
-        }`
+        ? `${data.benefits.length} benefit${
+            data.benefits.length > 1 ? "s" : ""
+          }`
         : "No benefits added";
     case "CULTURE_VIDEO":
       return data.videoUrl ? "Video embedded" : "No video URL";
     case "TEAM_LOCATIONS":
       return data.locations?.length
-        ? `${data.locations.length} location${data.locations.length > 1 ? "s" : ""
-        }`
+        ? `${data.locations.length} location${
+            data.locations.length > 1 ? "s" : ""
+          }`
         : "No locations added";
     case "JOBS_LIST":
       return data.subtitle || "List of job openings";
@@ -185,7 +188,7 @@ function SortableSectionItem({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="py-0 hover:shadow-md transition-shadow">
         <CardHeader className="p-3 sm:p-6">
           <div className="flex items-start justify-between gap-2 sm:gap-4">
             <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
@@ -221,7 +224,12 @@ function SortableSectionItem({
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-2 shrink-0">
-              <Button size="sm" variant="outline" onClick={onEdit} className="text-xs sm:text-sm px-2 sm:px-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onEdit}
+                className="text-xs sm:text-sm px-2 sm:px-3"
+              >
                 Edit
               </Button>
               <Button
@@ -472,23 +480,40 @@ export function BuilderClient({
   return (
     <>
       <div className="container mx-auto p-4 sm:p-6 space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-bold">Careers Page Builder</h1>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold flex-1 min-w-0">
+                Careers Page Builder
+              </h1>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div>
+                    <div className="shrink-0">
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={isSyncing || isPublishing ? "syncing" : "synced"}
-                          initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-                          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                          exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                          initial={{
+                            opacity: 0,
+                            scale: 0.8,
+                            filter: "blur(10px)",
+                          }}
+                          animate={{
+                            opacity: 1,
+                            scale: 1,
+                            filter: "blur(0px)",
+                          }}
+                          exit={{
+                            opacity: 0,
+                            scale: 0.8,
+                            filter: "blur(10px)",
+                          }}
                           transition={{ duration: 0.2 }}
-                          className={`relative p-2 rounded-full transition-colors ${isSyncing || isPublishing ? "bg-muted" : "bg-green-0"
-                            }`}
+                          className={`relative p-2 rounded-full transition-colors ${
+                            isSyncing || isPublishing
+                              ? "bg-muted"
+                              : "bg-green-0"
+                          }`}
                         >
                           {isSyncing || isPublishing ? (
                             <PiSpinner className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground animate-spin" />
@@ -524,14 +549,42 @@ export function BuilderClient({
               Customize your company's careers page
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="sm:size-default" asChild>
-              <a href={`/${companySlug}?preview=true`} target="_blank">
-                <PiEye className="mr-1 h-4 w-4" />
-                <span className="hidden sm:inline">Preview</span>
-                <span className="sm:hidden">Preview</span>
-              </a>
-            </Button>
+        </div>
+
+        {/* Status Badge */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Status:</span>
+          {!careersPage.published ? (
+            <Badge variant="secondary">Draft</Badge>
+          ) : hasUnpublishedChanges ? (
+            <Badge
+              variant="outline"
+              className="border-amber-500 bg-amber-50 text-amber-700"
+            >
+              Unpublished Changes
+            </Badge>
+          ) : (
+            <Badge variant="default" className="bg-green-600">
+              Live
+            </Badge>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-2 justify-between">
+          <Button
+            variant="outline"
+            size="sm"
+            className="sm:size-default"
+            asChild
+          >
+            <a href={`/${companySlug}?preview=true`} target="_blank">
+              <PiEye className="mr-1 h-4 w-4" />
+              <span className="hidden sm:inline">Preview</span>
+              <span className="sm:hidden">Preview</span>
+            </a>
+          </Button>
+          <div className="flex gap-2">
             {careersPage.published && hasUnpublishedChanges && (
               <Button
                 variant="destructive"
@@ -573,25 +626,6 @@ export function BuilderClient({
           </div>
         </div>
 
-        {/* Status Badge */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Status:</span>
-          {!careersPage.published ? (
-            <Badge variant="secondary">Draft</Badge>
-          ) : hasUnpublishedChanges ? (
-            <Badge
-              variant="outline"
-              className="border-amber-500 bg-amber-50 text-amber-700"
-            >
-              Unpublished Changes
-            </Badge>
-          ) : (
-            <Badge variant="default" className="bg-green-600">
-              Live
-            </Badge>
-          )}
-        </div>
-
         {/* Sections List */}
         <Card>
           <CardHeader>
@@ -603,7 +637,10 @@ export function BuilderClient({
                   icon to drag.
                 </CardDescription>
               </div>
-              <Button onClick={() => setAddSectionOpen(true)} className="w-full sm:w-auto shrink-0">
+              <Button
+                onClick={() => setAddSectionOpen(true)}
+                className="w-full sm:w-auto shrink-0"
+              >
                 <PiPlus className="mr-1 h-4 w-4" />
                 Add Section
               </Button>

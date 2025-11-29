@@ -109,18 +109,18 @@ export function ApplicationsClient({
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Applications</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">Applications</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Review and manage job applications
         </p>
       </div>
 
       {applications.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground">
+        <Card className="py-0">
+          <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+            <p className="text-sm sm:text-base text-muted-foreground">
               No applications received yet
             </p>
           </CardContent>
@@ -128,31 +128,31 @@ export function ApplicationsClient({
       ) : (
         <div className="grid gap-4">
           {applications.map((app) => (
-            <Card key={app.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CardTitle>
+            <Card className="py-0" key={app.id}>
+              <CardHeader className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                      <CardTitle className="text-lg sm:text-xl break-words">
                         {app.firstName} {app.lastName}
                       </CardTitle>
-                      <Badge variant={getStatusColor(app.status)}>
+                      <Badge variant={getStatusColor(app.status)} className="w-fit">
                         {app.status}
                       </Badge>
                     </div>
-                    <CardDescription className="space-y-1">
+                    <CardDescription className="space-y-1 text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
-                        <PiFileText className="h-4 w-4" />
-                        <span className="font-medium">{app.jobTitle}</span>
+                        <PiFileText className="h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium break-words">{app.jobTitle}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <PiEnvelope className="h-4 w-4" />
-                        <span>{app.email}</span>
+                        <PiEnvelope className="h-4 w-4 flex-shrink-0" />
+                        <span className="break-all">{app.email}</span>
                       </div>
                       {app.phone && (
                         <div className="flex items-center gap-2">
-                          <PiPhone className="h-4 w-4" />
-                          <span>{app.phone}</span>
+                          <PiPhone className="h-4 w-4 flex-shrink-0" />
+                          <span className="break-all">{app.phone}</span>
                         </div>
                       )}
                     </CardDescription>
@@ -165,7 +165,7 @@ export function ApplicationsClient({
                       }
                       disabled={updatingStatus === app.id}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -179,47 +179,50 @@ export function ApplicationsClient({
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 p-4 sm:p-6 pt-0">
                 {app.coverLetter && (
                   <div>
                     <p className="text-sm font-medium mb-1">Cover Letter</p>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
+                    <p className="text-sm text-muted-foreground line-clamp-3 break-words">
                       {app.coverLetter}
                     </p>
                   </div>
                 )}
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
                     <a
                       href={app.resumeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <PiFileText className="mr-1 h-4 w-4" />
-                      View Resume
+                      <PiFileText className="h-4 w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">View Resume</span>
+                      <span className="sm:hidden">Resume</span>
                     </a>
                   </Button>
                   {app.linkedinUrl && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
                       <a
                         href={app.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <PiLink className="mr-1 h-4 w-4" />
-                        LinkedIn
+                        <PiLink className="h-4 w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">LinkedIn</span>
+                        <span className="sm:hidden">LinkedIn</span>
                       </a>
                     </Button>
                   )}
                   {app.portfolioUrl && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
                       <a
                         href={app.portfolioUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <PiLink className="mr-1 h-4 w-4" />
-                        Portfolio
+                        <PiLink className="h-4 w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Portfolio</span>
+                        <span className="sm:hidden">Portfolio</span>
                       </a>
                     </Button>
                   )}

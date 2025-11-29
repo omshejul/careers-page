@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   PiSquaresFour,
@@ -10,20 +11,44 @@ import {
   PiGear,
   PiBuildings,
   PiArrowLeft,
+  PiSpinner,
+  PiX,
 } from "react-icons/pi";
+import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
   companySlug?: string;
   companyName?: string;
   companyLogo?: string;
+  onClose?: () => void;
 }
 
 export function Sidebar({
   companySlug,
   companyName,
   companyLogo,
+  onClose,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [loadingHref, setLoadingHref] = useState<string | null>(null);
+
+  const handleNavClick = (
+    href: string,
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    e.preventDefault();
+    if (pathname === href) {
+      return;
+    }
+    setLoadingHref(href);
+    router.push(href);
+  };
+
+  // Clear loading state when pathname changes (navigation completes)
+  useEffect(() => {
+    setLoadingHref(null);
+  }, [pathname]);
 
   const mainNavItems = companySlug
     ? [] // Hide main nav when in company context
@@ -72,13 +97,20 @@ export function Sidebar({
 
   return (
     <div className="flex h-full flex-col border-r bg-muted/40">
-      <div className="flex h-16 items-center border-b px-6">
+      <div className="flex h-16 items-center justify-between border-b px-6">
         {companySlug && companyName ? (
           <Link
             href={`/${companySlug}/overview`}
-            className="flex items-center gap-2 font-semibold"
+            onClick={(e) => handleNavClick(`/${companySlug}/overview`, e)}
+            className={cn(
+              "flex items-center gap-2 font-semibold",
+              loadingHref === `/${companySlug}/overview` &&
+                "pointer-events-none opacity-70"
+            )}
           >
-            {companyLogo ? (
+            {loadingHref === `/${companySlug}/overview` ? (
+              <PiSpinner className="h-6 w-6 animate-spin" />
+            ) : companyLogo ? (
               <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-md">
                 <img
                   src={companyLogo}
@@ -96,11 +128,30 @@ export function Sidebar({
         ) : (
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-semibold"
+            onClick={(e) => handleNavClick("/dashboard", e)}
+            className={cn(
+              "flex items-center gap-2 font-semibold",
+              loadingHref === "/dashboard" && "pointer-events-none opacity-70"
+            )}
           >
-            <PiBuildings className="h-6 w-6" />
+            {loadingHref === "/dashboard" ? (
+              <PiSpinner className="h-6 w-6 animate-spin" />
+            ) : (
+              <PiBuildings className="h-6 w-6" />
+            )}
             <span>Careers Builder</span>
           </Link>
+        )}
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="md:hidden"
+            aria-label="Close navigation"
+          >
+            <PiX className="h-5 w-5" />
+          </Button>
         )}
       </div>
 
@@ -114,19 +165,26 @@ export function Sidebar({
               {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
+                const isLoading = loadingHref === item.href;
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={(e) => handleNavClick(item.href, e)}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      isLoading && "pointer-events-none opacity-70"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    {isLoading ? (
+                      <PiSpinner className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Icon className="h-4 w-4" />
+                    )}
                     {item.title}
                   </Link>
                 );
@@ -145,19 +203,26 @@ export function Sidebar({
                 const isActive =
                   pathname === item.href ||
                   (item.title === "Overview" && pathname === `/${companySlug}`);
+                const isLoading = loadingHref === item.href;
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={(e) => handleNavClick(item.href, e)}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      isLoading && "pointer-events-none opacity-70"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    {isLoading ? (
+                      <PiSpinner className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Icon className="h-4 w-4" />
+                    )}
                     {item.title}
                   </Link>
                 );

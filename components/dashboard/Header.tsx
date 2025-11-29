@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { PiSignOut, PiUser, PiSquaresFour } from "react-icons/pi";
 
@@ -39,32 +41,64 @@ export function Header({
       .map((n) => n[0])
       .join("")
       .toUpperCase() || "??";
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Close drawer when pathname changes (page loads)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
       <div className="flex items-center gap-4">
         {companySlug && (
           <>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open navigation"
-                >
-                  <PiSquaresFour className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-xs p-0">
-                <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
-                <Sidebar
-                  companySlug={companySlug}
-                  companyName={companyName}
-                  companyLogo={companyLogo}
-                />
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="outline"
+              size="icon"
+              className="md:hidden"
+              aria-label="Open navigation"
+              onClick={() => setIsOpen(true)}
+            >
+              <PiSquaresFour className="h-5 w-5" />
+            </Button>
+
+            {/* Slide-in drawer */}
+            <AnimatePresence>
+              {isOpen && (
+                <>
+                  {/* Overlay */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed inset-0 z-50 bg-black/50 md:hidden"
+                    onClick={() => setIsOpen(false)}
+                  />
+                  {/* Drawer */}
+                  <motion.div
+                    initial={{ x: "-100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "-100%" }}
+                    transition={{
+                      type: "tween",
+                      duration: 0.3,
+                      ease: "easeInOut",
+                    }}
+                    className="fixed left-0 top-0 z-50 h-full w-[280px] bg-background shadow-lg md:hidden"
+                  >
+                    <Sidebar
+                      companySlug={companySlug}
+                      companyName={companyName}
+                      companyLogo={companyLogo}
+                      onClose={() => setIsOpen(false)}
+                    />
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
 
             {companyName && (
               <div className="flex items-center gap-2 md:hidden">
@@ -107,10 +141,10 @@ export function Header({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <button className="w-full cursor-pointer">
+              <Link href="/profile" className="w-full cursor-pointer">
                 <PiUser className="mr-1 h-4 w-4" />
                 <span>Profile</span>
-              </button>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -59,31 +59,31 @@ export default async function CompanyOverviewPage({
   const careersPage = await CareersPage.findOne({ companyId: company._id });
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4">
+    <div className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           {company.logo && (
-            <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-md">
+            <span className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center overflow-hidden rounded-md flex-shrink-0">
               <img
                 src={company.logo}
                 alt={company.name}
-                className="h-12 w-12 object-cover"
+                className="h-10 w-10 sm:h-12 sm:w-12 object-cover"
               />
             </span>
           )}
-          <div>
-            <h1 className="text-3xl font-bold">{company.name}</h1>
-            <p className="text-muted-foreground">{company.description}</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold truncate">{company.name}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground line-clamp-2">{company.description}</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <a href={`/${companySlug}`} target="_blank">
               <PiGlobe className="mr-1 h-4 w-4" />
               View Public Site
             </a>
           </Button>
-          <Button asChild>
+          <Button asChild className="w-full sm:w-auto">
             <Link href={`/${companySlug}/builder`}>
               <PiBuildings className="mr-1 h-4 w-4" />
               Manage Page
@@ -93,7 +93,7 @@ export default async function CompanyOverviewPage({
       </div>
 
       {/* Stats Overview */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
@@ -141,7 +141,7 @@ export default async function CompanyOverviewPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button variant="outline" asChild className="h-auto flex-col py-4">
               <Link href={`/${companySlug}/builder`}>
                 <PiBuildings className="mb-2 h-6 w-6" />
@@ -178,12 +178,12 @@ export default async function CompanyOverviewPage({
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium">Name</label>
-            <p className="text-sm text-muted-foreground">{company.name}</p>
+            <p className="text-sm text-muted-foreground break-words">{company.name}</p>
           </div>
           {company.description && (
             <div>
               <label className="text-sm font-medium">Description</label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground break-words">
                 {company.description}
               </p>
             </div>
@@ -191,12 +191,12 @@ export default async function CompanyOverviewPage({
           {company.website && (
             <div>
               <label className="text-sm font-medium">Website</label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground break-all">
                 <a
                   href={company.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline break-all"
                 >
                   {company.website}
                 </a>
@@ -205,12 +205,12 @@ export default async function CompanyOverviewPage({
           )}
           <div>
             <label className="text-sm font-medium">Public URL</label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground break-all">
               <a
                 href={`/${companySlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline break-all"
               >
                 /{companySlug}
               </a>

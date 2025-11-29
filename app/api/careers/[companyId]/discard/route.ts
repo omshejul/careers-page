@@ -58,7 +58,6 @@ export async function POST(
 
         // Revert all sections: copy publishedData back to data
         // Only update sections that have publishedData
-        // Also restore any soft-deleted sections that have publishedData
         await Section.updateMany(
             {
                 careersPageId: careersPage._id,
@@ -69,11 +68,22 @@ export async function POST(
                     $set: {
                         data: '$publishedData',
                         order: { $ifNull: ['$publishedOrder', '$order'] },
-                        enabled: { $ifNull: ['$publishedEnabled', '$enabled'] },
-                    },
-                    $unset: { deletedAt: 1 }
+                        enabled: { $ifNull: ['$publishedEnabled', '$enabled'] }
+                    }
                 }
             ]
+        )
+
+        // Restore any soft-deleted sections that have publishedData
+        // Use $unset to completely remove deletedAt field (not just set to null)
+        // This is needed because queries check `deletedAt: { $exists: false }`
+        await Section.updateMany(
+            {
+                careersPageId: careersPage._id,
+                publishedData: { $exists: true, $ne: null },
+                deletedAt: { $exists: true }
+            },
+            { $unset: { deletedAt: '' } }
         )
 
         // Delete any sections that don't have publishedData (they were added after last publish)
