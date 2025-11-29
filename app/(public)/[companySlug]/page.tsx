@@ -131,24 +131,27 @@ export default async function PublicCareersPage({
   // For published page: only show sections with publishedData
   const serializedSections = sections
     .filter((section: any) => {
-      // In preview mode, show all sections
-      if (isPreviewMode) return true;
-      // In production, only show sections that have been published
-      return (
-        section.publishedData !== undefined && section.publishedData !== null
-      );
+      if (isPreviewMode) {
+        return true;
+      }
+      if (section.publishedData !== undefined && section.publishedData !== null) {
+        return true;
+      }
+      // Fallback for legacy published data before publishedData existed
+      // Show draft data only if there are no unpublished changes recorded
+      return !careersPage.hasUnpublishedChanges;
     })
     .map((section: any) => {
       const sectionData = isPreviewMode
-        ? section.data // Preview shows draft
-        : section.publishedData; // Published shows only publishedData (no fallback)
+        ? section.data
+        : section.publishedData ?? section.data;
 
       return {
         ...section,
         data: sectionData,
         id: section._id.toString(),
         careersPageId: section.careersPageId.toString(),
-        _id: undefined, // Remove _id to avoid issues
+        _id: undefined,
       };
     });
 

@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PiPalette, PiBriefcase, PiRocket } from "react-icons/pi";
+import ColorBends from "@/components/ColorBends";
+
 
 export default async function HomePage() {
   const session = await auth();
@@ -14,6 +16,20 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <div className="fixed inset-0 -z-10">
+        <ColorBends
+          colors={["#ff0000", "#00ff00", "#0000ff"]}
+          rotation={30}
+          speed={0.3}
+          scale={1.2}
+          frequency={1.4}
+          warpStrength={1.2}
+          mouseInfluence={0.8}
+          parallax={0.6}
+          noise={0.08}
+          transparent
+        />
+      </div>
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="text-xl font-bold">Careers Page Builder</div>

@@ -30,6 +30,16 @@ import {
 import { IoCloudDoneOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -241,6 +251,11 @@ export function BuilderClient({
   const [editSection, setEditSection] = useState<TypedSection | null>(null);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState<TypedSection | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
   const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(
     careersPage.hasUnpublishedChanges
   );
@@ -293,14 +308,6 @@ export function BuilderClient({
   };
 
   const handleDiscardChanges = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to discard all unpublished changes? This will revert to the last published version and cannot be undone."
-      )
-    ) {
-      return;
-    }
-
     setIsDiscarding(true);
     setIsSyncing(true);
     try {
@@ -324,18 +331,19 @@ export function BuilderClient({
     } finally {
       setIsDiscarding(false);
       setIsSyncing(false);
+      setDiscardDialogOpen(false);
     }
   };
 
-  const handleDeleteSection = async (sectionId: string) => {
-    if (!confirm("Are you sure you want to delete this section?")) {
+  const handleConfirmDeleteSection = async () => {
+    if (!sectionToDelete) {
       return;
     }
-
+    setIsDeleting(true);
     setIsSyncing(true);
     try {
       const response = await fetch(
-        `/api/careers/${companyId}/sections/${sectionId}`,
+        `/api/careers/${companyId}/sections/${sectionToDelete.id}`,
         {
           method: "DELETE",
         }
@@ -347,7 +355,9 @@ export function BuilderClient({
       }
 
       toast.success("Section deleted successfully");
-      setSections(sections.filter((s) => s.id !== sectionId));
+      setSections((current) =>
+        current.filter((s) => s.id !== sectionToDelete.id)
+      );
       setHasUnpublishedChanges(true);
       router.refresh();
     } catch (error) {
@@ -356,7 +366,9 @@ export function BuilderClient({
         error instanceof Error ? error.message : "Failed to delete section"
       );
     } finally {
+      setIsDeleting(false);
       setIsSyncing(false);
+      setSectionToDelete(null);
     }
   };
 
@@ -505,7 +517,7 @@ export function BuilderClient({
             {careersPage.published && hasUnpublishedChanges && (
               <Button
                 variant="destructive"
-                onClick={handleDiscardChanges}
+                onClick={() => setDiscardDialogOpen(true)}
                 disabled={isDiscarding || isPublishing}
               >
                 {isDiscarding ? "Discarding..." : "Discard Changes"}
@@ -549,7 +561,7 @@ export function BuilderClient({
         {/* Sections List */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <div>
                 <CardTitle>Page Sections</CardTitle>
                 <CardDescription>
@@ -585,7 +597,7 @@ export function BuilderClient({
                         key={section.id}
                         section={section}
                         onEdit={() => setEditSection(section)}
-                        onDelete={() => handleDeleteSection(section.id)}
+                        onDelete={() => setSectionToDelete(section)}
                       />
                     ))}
                   </div>
@@ -657,6 +669,96 @@ export function BuilderClient({
           router.refresh();
         }}
       />
+
+      <ConfirmationDialogs
+        discardDialogOpen={discardDialogOpen}
+        setDiscardDialogOpen={setDiscardDialogOpen}
+        handleDiscardChanges={handleDiscardChanges}
+        isDiscarding={isDiscarding}
+        sectionToDelete={sectionToDelete}
+        setSectionToDelete={setSectionToDelete}
+        handleConfirmDeleteSection={handleConfirmDeleteSection}
+        isDeleting={isDeleting}
+      />
+    </>
+  );
+}
+
+// Alert dialogs
+function ConfirmationDialogs({
+  discardDialogOpen,
+  setDiscardDialogOpen,
+  handleDiscardChanges,
+  isDiscarding,
+  sectionToDelete,
+  setSectionToDelete,
+  handleConfirmDeleteSection,
+  isDeleting,
+}: {
+  discardDialogOpen: boolean;
+  setDiscardDialogOpen: (open: boolean) => void;
+  handleDiscardChanges: () => Promise<void>;
+  isDiscarding: boolean;
+  sectionToDelete: TypedSection | null;
+  setSectionToDelete: (section: TypedSection | null) => void;
+  handleConfirmDeleteSection: () => Promise<void>;
+  isDeleting: boolean;
+}) {
+  return (
+    <>
+      <AlertDialog open={discardDialogOpen} onOpenChange={setDiscardDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard unpublished changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will revert your careers page to the last published version.
+              Any draft updates you’ve made since the last publish will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDiscarding}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDiscardChanges}
+              disabled={isDiscarding}
+            >
+              {isDiscarding ? "Discarding..." : "Discard Changes"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={sectionToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSectionToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this section?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You’re about to permanently remove the section "
+              {sectionToDelete
+                ? (sectionToDelete.data as any)?.title || "Untitled"
+                : ""}
+              ". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeleteSection}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Section"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
