@@ -14,7 +14,9 @@ This repository contains a Careers Page builder application built with Next.js 1
 - **UI Components**: Shadcn/UI (Radix UI + Tailwind)
 - **Forms**: React Hook Form + Zod
 - **State/Data**: React Server Components + Server Actions (implicit in Next.js)
+- **Drag & Drop**: @dnd-kit (for Builder)
 - **Graphics/Effects**: Three.js (for custom background effects like Grid Distortion and Color Bends)
+- **Library**: React 19
 
 ## Draft & Publish System (New)
 
@@ -94,6 +96,7 @@ Protected routes for logged-in users to manage their company and careers page.
 
 - `app/(dashboard)/layout.tsx`: Main dashboard layout (sidebar, header).
 - `app/(dashboard)/dashboard/page.tsx`: Main dashboard landing page (company selection/creation).
+- `app/(dashboard)/profile/page.tsx`: User profile page with logout functionality.
 - `app/(dashboard)/[companySlug]/layout.tsx`: Layout for company-specific dashboard routes.
 - `app/(dashboard)/[companySlug]/overview/page.tsx`: Company overview/stats page.
 - `app/(dashboard)/[companySlug]/applications/page.tsx`: List of job applications for the company.
@@ -151,10 +154,12 @@ Reusable UI components and feature-specific components.
     - `HeroSection.tsx`: Now integrates `GridDistortion` for dynamic background effects.
     - `AboutSection.tsx`, `JobsList.tsx`, etc.
   - `index.tsx`: Export or main renderer for sections.
-- **Visual Effects (New)**:
+  - `CompanyTheme.tsx` (in `components/public`): Handles dynamic theming for the public careers page.
+- **Visual Effects**:
   - `GridDistortion.tsx`: A Three.js-based interactive image distortion component used in the Hero section. Includes mobile optimizations and responsive scaling.
   - `ColorBends.tsx`: A Three.js-based animated gradient background used on the main landing page.
   - `ColorBends.css`: Styles for the ColorBends component.
+  - `AnimatedHomePage.tsx`: Wrapper/Composition for the animated home page.
 - **Dashboard**:
   - `Header.tsx`, `Sidebar.tsx`: Navigation components.
   - `CompanySelector.tsx`: Dropdown to switch companies.
