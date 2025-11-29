@@ -270,9 +270,14 @@ ${faker.lorem.paragraph()}`;
       <div className="flex items-center justify-between mb-4">
         <div className="flex-1" />
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          animate={isGenerating ? { rotate: [0, 10, -10, 10, -10, 0] } : {}}
+          initial={{ filter: "blur(0px)" }}
+          whileHover={{ scale: 1.05, filter: "blur(0px)" }}
+          whileTap={{ scale: 0.95, filter: "blur(0px)" }}
+          animate={
+            isGenerating
+              ? { rotate: [0, 10, -10, 10, -10, 0], filter: "blur(0px)" }
+              : { filter: "blur(0px)" }
+          }
           transition={{ duration: 0.3 }}
         >
           <Button

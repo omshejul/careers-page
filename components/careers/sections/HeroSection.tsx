@@ -68,8 +68,8 @@ export function HeroSection({
 
         {hasJobs ? (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
+            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
             <Button
@@ -92,8 +92,8 @@ export function HeroSection({
         ) : (
           <div className="mx-auto max-w-2xl">
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
+              animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
               transition={{ delay: 0.6, duration: 0.6 }}
               className="flex items-center gap-4 rounded-2xl px-6 py-4"
               style={{

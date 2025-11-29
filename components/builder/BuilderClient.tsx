@@ -415,9 +415,9 @@ export function BuilderClient({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isSyncing || isPublishing ? "syncing" : "synced"}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
                   transition={{ duration: 0.2 }}
                   className={`relative border p-2 rounded-full transition-colors ${
                     isSyncing || isPublishing ? "bg-muted" : "bg-green-100"
@@ -427,8 +427,8 @@ export function BuilderClient({
                     <PiSpinner className="h-6 w-6 text-muted-foreground animate-spin" />
                   ) : (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ scale: 0, filter: "blur(10px)" }}
+                      animate={{ scale: 1, filter: "blur(0px)" }}
                       transition={{
                         type: "spring",
                         stiffness: 200,
