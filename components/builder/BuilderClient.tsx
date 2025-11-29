@@ -11,8 +11,38 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PiEye, PiFloppyDisk, PiGlobe, PiPlus, PiTrash } from "react-icons/pi";
+import {
+  PiEye,
+  PiGlobe,
+  PiPlus,
+  PiTrash,
+  PiDotsSixVertical,
+  PiSparkle,
+  PiUsers,
+  PiHeart,
+  PiVideo,
+  PiMapPin,
+  PiBriefcase,
+  PiFileText,
+} from "react-icons/pi";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { AddSectionDialog } from "./AddSectionDialog";
 import { EditSectionDialog } from "./EditSectionDialog";
 import { SEOSettingsDialog } from "./SEOSettingsDialog";
@@ -30,6 +60,169 @@ interface BuilderClientProps {
   sections: TypedSection[];
 }
 
+// Helper function to get section icon
+function getSectionIcon(type: string) {
+  switch (type) {
+    case "HERO":
+      return <PiSparkle className="h-5 w-5" />;
+    case "ABOUT":
+      return <PiFileText className="h-5 w-5" />;
+    case "VALUES":
+      return <PiHeart className="h-5 w-5" />;
+    case "BENEFITS":
+      return <PiUsers className="h-5 w-5" />;
+    case "CULTURE_VIDEO":
+      return <PiVideo className="h-5 w-5" />;
+    case "TEAM_LOCATIONS":
+      return <PiMapPin className="h-5 w-5" />;
+    case "JOBS_LIST":
+      return <PiBriefcase className="h-5 w-5" />;
+    default:
+      return <PiFileText className="h-5 w-5" />;
+  }
+}
+
+// Helper function to get section description
+function getSectionDescription(section: TypedSection): string {
+  const data = section.data as any;
+  switch (section.type) {
+    case "HERO":
+      return data.tagline || "Hero section with title and banner";
+    case "ABOUT":
+      return data.content
+        ? `${data.content.substring(0, 100)}${
+            data.content.length > 100 ? "..." : ""
+          }`
+        : "About section content";
+    case "VALUES":
+      return data.values?.length
+        ? `${data.values.length} value${data.values.length > 1 ? "s" : ""}`
+        : "No values added";
+    case "BENEFITS":
+      return data.benefits?.length
+        ? `${data.benefits.length} benefit${
+            data.benefits.length > 1 ? "s" : ""
+          }`
+        : "No benefits added";
+    case "CULTURE_VIDEO":
+      return data.videoUrl ? "Video embedded" : "No video URL";
+    case "TEAM_LOCATIONS":
+      return data.locations?.length
+        ? `${data.locations.length} location${
+            data.locations.length > 1 ? "s" : ""
+          }`
+        : "No locations added";
+    case "JOBS_LIST":
+      return data.subtitle || "List of job openings";
+    default:
+      return "Section content";
+  }
+}
+
+// Helper function to get section type label
+function getSectionTypeLabel(type: string): string {
+  switch (type) {
+    case "HERO":
+      return "Hero";
+    case "ABOUT":
+      return "About";
+    case "VALUES":
+      return "Values";
+    case "BENEFITS":
+      return "Benefits";
+    case "CULTURE_VIDEO":
+      return "Culture Video";
+    case "TEAM_LOCATIONS":
+      return "Team Locations";
+    case "JOBS_LIST":
+      return "Jobs List";
+    default:
+      return type;
+  }
+}
+
+// Sortable Section Item Component
+function SortableSectionItem({
+  section,
+  onEdit,
+  onDelete,
+}: {
+  section: TypedSection;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: section.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div
+                {...attributes}
+                {...listeners}
+                className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <PiDotsSixVertical className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-muted-foreground">
+                    {getSectionIcon(section.type)}
+                  </div>
+                  <Badge variant="outline" className="capitalize">
+                    {getSectionTypeLabel(section.type)}
+                  </Badge>
+                  <Badge
+                    variant={section.enabled ? "default" : "secondary"}
+                    className="text-xs"
+                  >
+                    {section.enabled ? "Enabled" : "Disabled"}
+                  </Badge>
+                </div>
+                <CardTitle className="text-base mb-1">
+                  {(section.data as any).title ||
+                    getSectionTypeLabel(section.type)}
+                </CardTitle>
+                <CardDescription className="text-sm line-clamp-2">
+                  {getSectionDescription(section)}
+                </CardDescription>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button size="sm" variant="outline" onClick={onEdit}>
+                Edit
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onDelete}
+                className="text-destructive hover:text-destructive"
+              >
+                <PiTrash className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+}
+
 export function BuilderClient({
   companyId,
   companySlug,
@@ -42,6 +235,13 @@ export function BuilderClient({
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [editSection, setEditSection] = useState<TypedSection | null>(null);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Sync sections state when props change (after router.refresh())
   useEffect(() => {
@@ -102,6 +302,38 @@ export function BuilderClient({
       toast.error(
         error instanceof Error ? error.message : "Failed to delete section"
       );
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = sections.findIndex((s) => s.id === active.id);
+      const newIndex = sections.findIndex((s) => s.id === over.id);
+
+      const newSections = arrayMove(sections, oldIndex, newIndex);
+      setSections(newSections);
+
+      // Update order in database
+      try {
+        const updatePromises = newSections.map((section, index) =>
+          fetch(`/api/careers/${companyId}/sections/${section.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order: index }),
+          })
+        );
+
+        await Promise.all(updatePromises);
+        toast.success("Sections reordered successfully");
+        router.refresh();
+      } catch (error) {
+        console.error("Error reordering sections:", error);
+        toast.error("Failed to reorder sections");
+        // Revert on error
+        setSections(sections);
+      }
     }
   };
 
@@ -196,7 +428,8 @@ export function BuilderClient({
               <div>
                 <CardTitle>Page Sections</CardTitle>
                 <CardDescription>
-                  Manage the sections on your careers page
+                  Drag and drop to reorder sections. Click and hold the grip
+                  icon to drag.
                 </CardDescription>
               </div>
               <Button onClick={() => setAddSectionOpen(true)}>
@@ -212,43 +445,27 @@ export function BuilderClient({
                 <p className="text-sm">Click "Add Section" to get started</p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {sections.map((section) => (
-                  <Card key={section.id}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline">{section.type}</Badge>
-                          <CardTitle className="text-base">
-                            {(section.data as any).title || section.type}
-                          </CardTitle>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={section.enabled ? "default" : "secondary"}
-                          >
-                            {section.enabled ? "Enabled" : "Disabled"}
-                          </Badge>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditSection(section)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteSection(section.id)}
-                          >
-                            <PiTrash className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={sections.map((s) => s.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {sections.map((section) => (
+                      <SortableSectionItem
+                        key={section.id}
+                        section={section}
+                        onEdit={() => setEditSection(section)}
+                        onDelete={() => handleDeleteSection(section.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </CardContent>
         </Card>
