@@ -19,7 +19,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center">
+    <div className="relative flex min-h-svh items-center justify-center">
       <Link
         href="/"
         className="absolute left-4 top-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

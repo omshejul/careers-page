@@ -26,7 +26,7 @@ export default function AnimatedHomePage() {
 
     return (
         <AnimatePresence>
-            <div className="flex min-h-[80vh] flex-col">
+            <div className="flex min-h-svh flex-col">
                 <div className="fixed inset-0 -z-10">
                     <ColorBends
                         colors={["#ff0000", "#00ff00", "#0000ff"]}
@@ -50,8 +50,15 @@ export default function AnimatedHomePage() {
                 >
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                         <div className="text-xl font-bold">Careers Page Builder</div>
-                        <Button asChild>
-                            <Link href="/login">Sign In</Link>
+                        <Button onClick={handleLoginClick} disabled={isLoginLoading}>
+                            {isLoginLoading ? (
+                                <>
+                                    <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" />
+                                    Loading...
+                                </>
+                            ) : (
+                                "Sign In"
+                            )}
                         </Button>
                     </div>
                 </motion.header>
@@ -83,11 +90,36 @@ export default function AnimatedHomePage() {
                             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                             transition={{ delay: 0.4, duration: 0.6 }}
                         >
-                            <Button size="lg" className="w-full sm:w-auto max-w-xs" asChild>
-                                <Link href="/login">Get Started</Link>
+                            <Button
+                                size="lg"
+                                className="w-full sm:w-auto max-w-xs"
+                                onClick={handleLoginClick}
+                                disabled={isLoginLoading}
+                            >
+                                {isLoginLoading ? (
+                                    <>
+                                        <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    "Get Started"
+                                )}
                             </Button>
-                            <Button size="lg" variant="outline" className="w-full sm:w-auto max-w-xs" asChild>
-                                <Link href="/demo-company">View Demo</Link>
+                            <Button
+                                size="lg"
+                                variant="outline"
+                                className="w-full sm:w-auto max-w-xs"
+                                onClick={handleDemoClick}
+                                disabled={isDemoLoading}
+                            >
+                                {isDemoLoading ? (
+                                    <>
+                                        <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    "View Demo"
+                                )}
                             </Button>
                         </motion.div>
                     </div>

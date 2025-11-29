@@ -77,7 +77,7 @@ export default async function DashboardPage({
   });
 
   return (
-    <div className="flex min-h-screen flex-col overflow-hidden">
+    <div className="flex min-h-svh flex-col overflow-hidden">
       <Header user={session.user} />
       <main className="flex-1 overflow-auto">
         <div className="container mx-auto p-6 space-y-8">

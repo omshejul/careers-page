@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export default function Footer() {
     return (
         <motion.footer
-            className="fixed bottom-0 left-0 right-0 backdrop-blur-sm bg-background/5 border-t py-6"
+            className="mt-auto border-t bg-background/5 backdrop-blur-sm py-6"
             initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
             transition={{ delay: 0.9, duration: 0.6 }}

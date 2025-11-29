@@ -157,8 +157,8 @@ export default async function PublicCareersPage({
       const sectionData = isPreviewMode
         ? section.data
         : section.publishedData && Object.keys(section.publishedData).length > 0
-        ? section.publishedData
-        : section.data;
+          ? section.publishedData
+          : section.data;
 
       return {
         ...section,
@@ -189,7 +189,7 @@ export default async function PublicCareersPage({
   );
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-svh flex-col">
       {/* Preview Mode Banner */}
       {isPreviewMode && (
         <div className="sticky top-0 z-50 bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950">
@@ -216,8 +216,8 @@ export default async function PublicCareersPage({
             {!careersPage.published
               ? "Preview Mode — This page is not published yet"
               : careersPage.hasUnpublishedChanges
-              ? "Preview Mode — Viewing draft with unpublished changes"
-              : "Preview Mode — No unpublished changes"}
+                ? "Preview Mode — Viewing draft with unpublished changes"
+                : "Preview Mode — No unpublished changes"}
           </span>
         </div>
       )}

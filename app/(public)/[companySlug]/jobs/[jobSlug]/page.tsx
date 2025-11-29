@@ -84,7 +84,7 @@ export default async function JobDetailPage({
   const job = jobDoc.toObject();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-svh bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="container mx-auto px-4 py-4">
