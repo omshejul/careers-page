@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { HeroSection as HeroSectionType } from "@/types/section";
 import { Button } from "@/components/ui/button";
-import { PiArrowDown } from "react-icons/pi";
+import { PiArrowDown, PiBriefcase } from "react-icons/pi";
 
 interface HeroSectionProps {
   section: HeroSectionType;
@@ -94,15 +94,64 @@ export function HeroSection({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.6 }}
-            className="inline-block rounded-lg bg-yellow-500/10 backdrop-blur-md px-8 py-8 border-2 border-dashed border-yellow-400/50 shadow-xl"
+            className="mx-auto max-w-2xl"
           >
-            <p className="text-xl font-bold mb-2 text-white">
-              No open positions available at the moment.
-            </p>
-            <p className="text-base text-white/95">
-              We're not currently hiring, but check back soon for new
-              opportunities!
-            </p>
+            <div
+              className="flex items-center gap-4 rounded-2xl px-6 py-4"
+              style={{
+                background: primaryColor
+                  ? `linear-gradient(145deg, ${primaryColor}dd, ${primaryColor}aa)`
+                  : "linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))",
+                boxShadow: `
+                  inset 0 2px 4px rgba(255,255,255,0.2),
+                  inset 0 -2px 4px rgba(0,0,0,0.1),
+                  0 8px 16px rgba(0,0,0,0.2),
+                  0 2px 4px rgba(0,0,0,0.1)
+                `,
+                border: primaryColor
+                  ? `1px solid ${primaryColor}80`
+                  : "1px solid rgba(255,255,255,0.1)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <div
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(145deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1))",
+                  boxShadow: `
+                    inset 0 2px 4px rgba(255,255,255,0.3),
+                    inset 0 -2px 4px rgba(0,0,0,0.1),
+                    0 4px 8px rgba(0,0,0,0.15)
+                  `,
+                  border: "1px solid rgba(255,255,255,0.2)",
+                }}
+              >
+                <PiBriefcase className="h-8 w-8 text-white drop-shadow-lg" />
+              </div>
+              <div className="flex-1">
+                <h3
+                  className="text-xl font-semibold md:text-2xl mb-1"
+                  style={{
+                    textShadow:
+                      "0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+                    color: "white",
+                  }}
+                >
+                  No open positions available at the moment.
+                </h3>
+                <p
+                  className="text-sm md:text-base"
+                  style={{
+                    textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                    color: "rgba(255,255,255,0.95)",
+                  }}
+                >
+                  We're not currently hiring, but check back soon for new
+                  opportunities!
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
       </div>

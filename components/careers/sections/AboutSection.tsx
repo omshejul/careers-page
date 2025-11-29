@@ -18,7 +18,7 @@ export function AboutSection({ section }: AboutSectionProps) {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-4 max-w-6xl">
         <h2 className="mb-8 text-center text-3xl font-bold md:text-4xl">
           {title}
         </h2>

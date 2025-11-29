@@ -295,7 +295,7 @@ export function JobsListSection({
 
   return (
     <section id="jobs-section" className="bg-muted/50 py-16">
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-4 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -313,13 +313,18 @@ export function JobsListSection({
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center py-12"
+            className="flex items-center justify-center py-16 md:py-24"
           >
-            <div className="mx-auto max-w-md">
-              <p className="text-xl font-semibold text-foreground mb-3">
-                No open positions available at the moment.
-              </p>
-              <p className="text-base text-muted-foreground">
+            <div className="mx-auto max-w-md text-center">
+              <div className="mb-6 flex justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                  <PiBriefcase className="h-10 w-10 text-primary" />
+                </div>
+              </div>
+              <h3 className="mb-3 text-2xl font-semibold text-foreground md:text-3xl">
+                No open positions available at the moment
+              </h3>
+              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
                 We're not currently hiring, but check back soon for new
                 opportunities!
               </p>
