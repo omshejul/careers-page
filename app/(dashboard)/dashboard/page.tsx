@@ -40,23 +40,35 @@ export default async function DashboardPage({
   }).populate("companyId");
 
   const companies = await Promise.all(
-    userCompanies.map(async (uc) => {
-      const company = uc.companyId as any;
-      const jobCount = await Job.countDocuments({ companyId: company._id });
-      return {
-        ...company.toObject(),
-        id: company._id.toString(),
-        _count: {
-          jobs: jobCount,
-        },
-      };
-    })
+    userCompanies
+      .filter((uc) => uc.companyId !== null) // Filter out null companies (deleted)
+      .map(async (uc) => {
+        const company = uc.companyId as any;
+        if (!company) return null;
+        const jobCount = await Job.countDocuments({ companyId: company._id });
+        return {
+          ...company.toObject(),
+          id: company._id.toString(),
+          _count: {
+            jobs: jobCount,
+          },
+        };
+      })
   );
 
-  // Fetch total stats across all companies
-  const totalJobs = companies.reduce((sum, c) => sum + c._count.jobs, 0);
+  // Filter out any null entries (shouldn't happen after filter, but just in case)
+  const validCompanies = companies.filter((c) => c !== null) as Array<{
+    id: string;
+    name: string;
+    slug: string;
+    website?: string;
+    _count: { jobs: number };
+  }>;
 
-  const companyIds = companies.map((c) => c.id);
+  // Fetch total stats across all companies
+  const totalJobs = validCompanies.reduce((sum, c) => sum + c._count.jobs, 0);
+
+  const companyIds = validCompanies.map((c) => c.id);
   const jobIds = await Job.find({ companyId: { $in: companyIds } }).distinct(
     "_id"
   );
@@ -95,7 +107,7 @@ export default async function DashboardPage({
                 <PiBuildings className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{companies.length}</div>
+                <div className="text-2xl font-bold">{validCompanies.length}</div>
                 <p className="text-xs text-muted-foreground">
                   Total companies managed
                 </p>
@@ -137,7 +149,7 @@ export default async function DashboardPage({
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Your Companies</h2>
 
-            {companies.length === 0 ? (
+            {validCompanies.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <PiBuildings className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -157,7 +169,7 @@ export default async function DashboardPage({
               </Card>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {companies.map((company) => (
+                {validCompanies.map((company) => (
                   <Card
                     key={company.id}
                     className="transition-shadow hover:shadow-lg"

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { connectDB, CompanyUser, Company, Job } from '@/lib/db'
+import { connectDB, CompanyUser, Company, Job, Application, CareersPage, Section } from '@/lib/db'
 import { updateCompanySchema } from '@/lib/validations/company'
 import mongoose from 'mongoose'
 
@@ -165,6 +165,31 @@ export async function DELETE(
       )
     }
 
+    const companyObjectId = new mongoose.Types.ObjectId(companyId)
+
+    // Get careers page to delete sections
+    const careersPage = await CareersPage.findOne({ companyId: companyObjectId })
+    if (careersPage) {
+      // Delete all sections for this careers page
+      await Section.deleteMany({ careersPageId: careersPage._id })
+      // Delete the careers page
+      await CareersPage.findByIdAndDelete(careersPage._id)
+    }
+
+    // Get all jobs for this company to delete applications
+    const jobs = await Job.find({ companyId: companyObjectId }).distinct('_id')
+    if (jobs.length > 0) {
+      // Delete all applications for these jobs
+      await Application.deleteMany({ jobId: { $in: jobs } })
+    }
+
+    // Delete all jobs for this company
+    await Job.deleteMany({ companyId: companyObjectId })
+
+    // Delete all company user associations
+    await CompanyUser.deleteMany({ companyId: companyObjectId })
+
+    // Finally, delete the company itself
     await Company.findByIdAndDelete(companyId)
 
     return NextResponse.json({ message: 'Company deleted successfully' })

@@ -25,25 +25,31 @@ export async function GET(request: NextRequest) {
     }).populate('companyId')
 
     const companies = await Promise.all(
-      companyUsers.map(async (cu) => {
-        const company = cu.companyId as any
-        const jobCount = await Job.countDocuments({ companyId: company._id })
-        const userCount = await CompanyUser.countDocuments({ companyId: company._id })
+      companyUsers
+        .filter((cu) => cu.companyId !== null) // Filter out null companies (deleted)
+        .map(async (cu) => {
+          const company = cu.companyId as any
+          if (!company) return null
+          const jobCount = await Job.countDocuments({ companyId: company._id })
+          const userCount = await CompanyUser.countDocuments({ companyId: company._id })
 
-        return {
-          ...company.toObject(),
-          id: company._id.toString(),
-          role: cu.role,
-          _count: {
-            jobs: jobCount,
-            users: userCount,
-          },
-        }
-      })
+          return {
+            ...company.toObject(),
+            id: company._id.toString(),
+            role: cu.role,
+            _count: {
+              jobs: jobCount,
+              users: userCount,
+            },
+          }
+        })
     )
 
+    // Filter out any null entries
+    const validCompanies = companies.filter((c) => c !== null)
+
     return NextResponse.json({
-      data: companies,
+      data: validCompanies,
     })
   } catch (error) {
     console.error('Error fetching companies:', error)

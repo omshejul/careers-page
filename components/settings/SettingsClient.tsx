@@ -14,6 +14,18 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { PiTrash, PiWarning } from "react-icons/pi";
 import { toast } from "sonner";
 
 interface Company {
@@ -41,6 +53,8 @@ export function SettingsClient({
 }: SettingsClientProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [company, setCompany] = useState(initialCompany);
 
   const {
@@ -76,6 +90,30 @@ export function SettingsClient({
       );
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/companies/${companyId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to delete company");
+      }
+
+      toast.success("Company deleted successfully");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error deleting company:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete company"
+      );
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -229,6 +267,72 @@ export function SettingsClient({
           </CardContent>
         </Card>
       </form>
+
+      {/* Danger Zone */}
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardDescription>
+            Irreversible and destructive actions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="text-sm font-semibold">Delete Company</h3>
+              <p className="text-sm text-muted-foreground">
+                Once you delete a company, there is no going back. This will
+                permanently delete the company, all jobs, applications, and
+                careers page data.
+              </p>
+            </div>
+            <AlertDialog
+              open={deleteDialogOpen}
+              onOpenChange={setDeleteDialogOpen}
+            >
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={isDeleting}>
+                  <PiTrash className="mr-2 h-4 w-4" />
+                  Delete Company
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <PiWarning className="h-5 w-5 text-destructive" />
+                    Are you absolutely sure?
+                  </AlertDialogTitle>
+                  <div className="pt-2 space-y-2">
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      the company <strong>{company.name}</strong> and all of its
+                      data including:
+                    </AlertDialogDescription>
+                    <ul className="ml-4 list-disc space-y-1 text-sm text-muted-foreground">
+                      <li>All job postings</li>
+                      <li>All job applications</li>
+                      <li>Careers page and all sections</li>
+                      <li>Company settings and branding</li>
+                    </ul>
+                  </div>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isDeleting ? "Deleting..." : "Delete Company"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
