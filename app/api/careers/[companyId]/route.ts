@@ -51,21 +51,23 @@ export async function GET(
       )
     }
 
-    const sections = await Section.find({ careersPageId: careersPage._id })
+    const careersPageObj = careersPage as any
+
+    const sections = await Section.find({ careersPageId: careersPageObj._id })
       .sort({ order: 'asc' })
       .lean()
 
     return NextResponse.json({
       data: {
-        ...careersPage,
-        id: careersPage._id.toString(),
-        companyId: careersPage.companyId.toString(),
+        ...careersPageObj,
+        id: careersPageObj._id.toString(),
+        companyId: careersPageObj.companyId.toString(),
         sections: sections.map((s: any) => ({
           ...s,
           id: s._id.toString(),
           careersPageId: s.careersPageId.toString(),
         })),
-        company: careersPage.companyId,
+        company: careersPageObj.companyId,
       },
     })
   } catch (error) {

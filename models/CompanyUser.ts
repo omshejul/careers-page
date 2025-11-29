@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from 'mongoose'
 export type UserRole = 'ADMIN' | 'EDITOR' | 'VIEWER'
 
 export interface ICompanyUser extends Document {
-  _id: string
   companyId: mongoose.Types.ObjectId
   userId: mongoose.Types.ObjectId
   role: UserRole

@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from 'mongoose'
 export type ApplicationStatus = 'PENDING' | 'REVIEWING' | 'SHORTLISTED' | 'REJECTED' | 'HIRED'
 
 export interface IApplication extends Document {
-  _id: string
   jobId: mongoose.Types.ObjectId
   firstName: string
   lastName: string

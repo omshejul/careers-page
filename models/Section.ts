@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from 'mongoose'
 export type SectionType = 'HERO' | 'ABOUT' | 'VALUES' | 'BENEFITS' | 'CULTURE_VIDEO' | 'TEAM_LOCATIONS' | 'JOBS_LIST'
 
 export interface ISection extends Document {
-  _id: string
   careersPageId: mongoose.Types.ObjectId
   type: SectionType
   order: number

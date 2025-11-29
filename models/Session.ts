@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
 export interface ISession extends Document {
-  _id: string
   sessionToken: string
   userId: mongoose.Types.ObjectId
   expires: Date

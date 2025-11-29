@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
 export interface ICareersPage extends Document {
-  _id: string
   companyId: mongoose.Types.ObjectId
   published: boolean
   customDomain?: string
