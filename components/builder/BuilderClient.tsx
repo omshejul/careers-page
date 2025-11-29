@@ -27,7 +27,7 @@ import {
   PiFileText,
   PiSpinner,
 } from "react-icons/pi";
-import { IoCloudDone } from "react-icons/io5";
+import { IoCloudDoneOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -420,8 +420,8 @@ export function BuilderClient({
                   animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
                   transition={{ duration: 0.2 }}
-                  className={`relative border p-2 rounded-full transition-colors ${
-                    isSyncing || isPublishing ? "bg-muted" : "bg-green-100"
+                  className={`relative p-2 rounded-full transition-colors ${
+                    isSyncing || isPublishing ? "bg-muted" : "bg-green-0"
                   }`}
                 >
                   {isSyncing || isPublishing ? (
@@ -437,7 +437,7 @@ export function BuilderClient({
                         delay: 0.1,
                       }}
                     >
-                      <IoCloudDone className="h-6 w-6 text-green-500" />
+                      <IoCloudDoneOutline className="h-6 w-6 text-green-500" />
                     </motion.div>
                   )}
                 </motion.div>
@@ -470,15 +470,18 @@ export function BuilderClient({
         {/* Status Badge */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Status:</span>
-          <Badge variant={careersPage.published ? "default" : "secondary"}>
-            {careersPage.published ? "Published" : "Draft"}
-          </Badge>
-          {careersPage.published && careersPage.hasUnpublishedChanges && (
+          {!careersPage.published ? (
+            <Badge variant="secondary">Draft</Badge>
+          ) : careersPage.hasUnpublishedChanges ? (
             <Badge
               variant="outline"
-              className="border-amber-500 text-amber-600"
+              className="border-amber-500 bg-amber-50 text-amber-700"
             >
               Unpublished Changes
+            </Badge>
+          ) : (
+            <Badge variant="default" className="bg-green-600">
+              Live
             </Badge>
           )}
         </div>
