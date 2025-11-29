@@ -5,6 +5,7 @@ import { CultureVideoSection as CultureVideoSectionType } from "@/types/section"
 
 interface CultureVideoSectionProps {
   section: CultureVideoSectionType;
+  isAltBackground?: boolean;
 }
 
 function getEmbedUrl(url: string): string {
@@ -29,12 +30,15 @@ function getEmbedUrl(url: string): string {
   return url;
 }
 
-export function CultureVideoSection({ section }: CultureVideoSectionProps) {
+export function CultureVideoSection({
+  section,
+  isAltBackground,
+}: CultureVideoSectionProps) {
   const { title, videoUrl, description } = section.data;
   const embedUrl = getEmbedUrl(videoUrl);
 
   return (
-    <section className="bg-muted/50 py-16">
+    <section className={`py-16 ${isAltBackground ? "bg-muted/50" : ""}`}>
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

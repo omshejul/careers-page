@@ -63,6 +63,7 @@ interface JobsListSectionProps {
   section: JobsListSectionType;
   jobs?: JobWithCompany[];
   companySlug?: string;
+  isAltBackground?: boolean;
 }
 
 type ViewMode = "grid" | "table";
@@ -71,6 +72,7 @@ export function JobsListSection({
   section,
   jobs = [],
   companySlug,
+  isAltBackground,
 }: JobsListSectionProps) {
   const { title, subtitle } = section.data;
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -294,12 +296,16 @@ export function JobsListSection({
   });
 
   return (
-    <section id="jobs-section" className="bg-muted/50 py-16">
+    <section
+      id="jobs-section"
+      className={`py-16 ${isAltBackground ? "bg-muted/50" : ""}`}
+    >
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true }}
+          transition={{ duration: 0.3 }}
           className="mb-12 text-center"
         >
           <h2 className="mb-4 text-3xl font-bold md:text-4xl">{title}</h2>
@@ -310,9 +316,10 @@ export function JobsListSection({
 
         {jobs.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
+            transition={{ duration: 0.3 }}
             className="flex items-center justify-center py-16 md:py-24"
           >
             <div className="mx-auto max-w-md text-center">
@@ -347,9 +354,21 @@ export function JobsListSection({
                     <AnimatePresence>
                       {globalFilter && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
+                          initial={{
+                            opacity: 0,
+                            scale: 0.8,
+                            filter: "blur(10px)",
+                          }}
+                          animate={{
+                            opacity: 1,
+                            scale: 1,
+                            filter: "blur(0px)",
+                          }}
+                          exit={{
+                            opacity: 0,
+                            scale: 0.8,
+                            filter: "blur(10px)",
+                          }}
                           transition={{ duration: 0.15 }}
                           className="absolute right-1 top-1/2 -translate-y-1/2"
                         >
@@ -431,7 +450,13 @@ export function JobsListSection({
               </div>
 
               {/* Column Filters */}
-              <motion.div layout className="flex flex-wrap items-center gap-2">
+              <motion.div
+                layout
+                initial={{ opacity: 0, filter: "blur(8px)" }}
+                animate={{ opacity: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-wrap items-center gap-2"
+              >
                 {uniqueDepartments.length > 0 && (
                   <Select
                     value={
@@ -534,9 +559,9 @@ export function JobsListSection({
                 <AnimatePresence>
                   {(columnFilters.length > 0 || globalFilter) && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
                       transition={{ duration: 0.15 }}
                     >
                       <Button
@@ -563,8 +588,8 @@ export function JobsListSection({
                     ? table.getFilteredRowModel().rows.length
                     : filteredJobsForGrid.length
                 }`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, filter: "blur(8px)" }}
+                animate={{ opacity: 1, filter: "blur(0px)" }}
                 transition={{ duration: 0.2 }}
                 className="text-sm text-muted-foreground"
               >
@@ -580,9 +605,9 @@ export function JobsListSection({
               {viewMode === "grid" ? (
                 <motion.div
                   key="grid"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, filter: "blur(12px)" }}
+                  animate={{ opacity: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, filter: "blur(12px)" }}
                   transition={{ duration: 0.2 }}
                   className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
                 >
@@ -590,9 +615,9 @@ export function JobsListSection({
                     {filteredJobsForGrid.length === 0 ? (
                       <motion.div
                         key="empty"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, filter: "blur(10px)" }}
                         transition={{ duration: 0.2 }}
                         className="col-span-full py-12 text-center"
                       >
@@ -604,9 +629,23 @@ export function JobsListSection({
                       filteredJobsForGrid.map((job, index) => (
                         <motion.div
                           key={job.id}
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
+                          initial={{
+                            opacity: 0,
+                            y: 10,
+                            scale: 0.95,
+                            filter: "blur(10px)",
+                          }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            filter: "blur(0px)",
+                          }}
+                          exit={{
+                            opacity: 0,
+                            scale: 0.95,
+                            filter: "blur(10px)",
+                          }}
                           transition={{
                             duration: 0.2,
                             delay: Math.min(index * 0.02, 0.1),
@@ -660,9 +699,9 @@ export function JobsListSection({
               ) : (
                 <motion.div
                   key="table"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, filter: "blur(12px)" }}
+                  animate={{ opacity: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, filter: "blur(12px)" }}
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden rounded-md border"
                 >

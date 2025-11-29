@@ -14,13 +14,17 @@ import Image from "next/image";
 
 interface TeamLocationsSectionProps {
   section: TeamLocationsSectionType;
+  isAltBackground?: boolean;
 }
 
-export function TeamLocationsSection({ section }: TeamLocationsSectionProps) {
+export function TeamLocationsSection({
+  section,
+  isAltBackground,
+}: TeamLocationsSectionProps) {
   const { title, locations } = section.data;
 
   return (
-    <section className="py-16">
+    <section className={`py-16 ${isAltBackground ? "bg-muted/50" : ""}`}>
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

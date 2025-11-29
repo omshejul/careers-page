@@ -12,13 +12,17 @@ import {
 
 interface BenefitsSectionProps {
   section: BenefitsSectionType;
+  isAltBackground?: boolean;
 }
 
-export function BenefitsSection({ section }: BenefitsSectionProps) {
+export function BenefitsSection({
+  section,
+  isAltBackground,
+}: BenefitsSectionProps) {
   const { title, benefits } = section.data;
 
   return (
-    <section className="py-16">
+    <section className={`py-16 ${isAltBackground ? "bg-muted/50" : ""}`}>
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

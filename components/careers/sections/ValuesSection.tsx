@@ -12,13 +12,17 @@ import {
 
 interface ValuesSectionProps {
   section: ValuesSectionType;
+  isAltBackground?: boolean;
 }
 
-export function ValuesSection({ section }: ValuesSectionProps) {
+export function ValuesSection({
+  section,
+  isAltBackground,
+}: ValuesSectionProps) {
   const { title, values } = section.data;
 
   return (
-    <section className="bg-muted/50 py-16">
+    <section className={`py-16 ${isAltBackground ? "bg-muted/50" : ""}`}>
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
