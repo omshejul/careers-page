@@ -133,10 +133,13 @@ export async function DELETE(
       )
     }
 
-    const section = await Section.findOneAndDelete({
-      _id: sectionId,
-      careersPageId: careersPage._id,
-    })
+    const section = await Section.findOneAndUpdate(
+      {
+        _id: sectionId,
+        careersPageId: careersPage._id,
+      },
+      { deletedAt: new Date() }
+    )
 
     if (!section) {
       return NextResponse.json(

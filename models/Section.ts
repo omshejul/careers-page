@@ -9,6 +9,9 @@ export interface ISection extends Document {
   enabled: boolean
   data: Record<string, any>
   publishedData?: Record<string, any> // Last published version of data
+  publishedOrder?: number
+  publishedEnabled?: boolean
+  deletedAt?: Date // For soft deletes
   createdAt: Date
   updatedAt: Date
 }
@@ -25,6 +28,9 @@ const SectionSchema = new Schema<ISection>(
     enabled: { type: Boolean, default: true },
     data: { type: Schema.Types.Mixed, required: true },
     publishedData: { type: Schema.Types.Mixed }, // Stores last published version
+    publishedOrder: { type: Number },
+    publishedEnabled: { type: Boolean },
+    deletedAt: { type: Date },
   },
   {
     timestamps: true,

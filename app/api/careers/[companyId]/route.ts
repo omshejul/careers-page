@@ -53,7 +53,10 @@ export async function GET(
 
     const careersPageObj = careersPage as any
 
-    const sections = await Section.find({ careersPageId: careersPageObj._id })
+    const sections = await Section.find({
+      careersPageId: careersPageObj._id,
+      deletedAt: { $exists: false }
+    })
       .sort({ order: 'asc' })
       .lean()
 
@@ -112,10 +115,28 @@ export async function PATCH(
     if (validatedData.published === true) {
       const existingCareersPage = await CareersPage.findOne({ companyId })
       if (existingCareersPage) {
-        // Copy data to publishedData for all sections
+        // 1. Permanently delete sections that were soft-deleted
+        await Section.deleteMany({
+          careersPageId: existingCareersPage._id,
+          deletedAt: { $exists: true },
+        })
+
+        // 2. Copy data to publishedData for remaining sections
+        // Also copy order and enabled status
         await Section.updateMany(
-          { careersPageId: existingCareersPage._id },
-          [{ $set: { publishedData: '$data' } }]
+          {
+            careersPageId: existingCareersPage._id,
+            deletedAt: { $exists: false },
+          },
+          [
+            {
+              $set: {
+                publishedData: '$data',
+                publishedOrder: '$order',
+                publishedEnabled: '$enabled',
+              },
+            },
+          ]
         )
 
         // Clear the unpublished changes flag
@@ -136,7 +157,10 @@ export async function PATCH(
       )
     }
 
-    const sections = await Section.find({ careersPageId: careersPage._id })
+    const sections = await Section.find({
+      careersPageId: careersPage._id,
+      deletedAt: { $exists: false }
+    })
       .sort({ order: 'asc' })
       .lean()
 

@@ -27,10 +27,20 @@ The application implements a robust "Draft vs. Live" system for careers pages, a
     - **Draft Data**: Stored in the standard `data` field of the `Section` model. All Builder edits affect this field.
     - **Live Data**: Stored in the `publishedData` field of the `Section` model. This is what public visitors see.
     - **Unpublished Changes Flag**: The `CareersPage` model tracks `hasUnpublishedChanges` (boolean). This is set to `true` whenever a section is created, updated, or deleted.
+    - **Soft Deletion**: The `Section` model uses `deletedAt` for sections deleted in Draft.
+      - **Builder**: Hides soft-deleted sections.
+      - **Preview Mode**: Hides soft-deleted sections.
+      - **Live Mode**: Shows soft-deleted sections IF they have `publishedData` (simulating the live state where it still exists).
+    - **Section State (Order & Enabled)**:
+      - **Draft State**: Uses standard `order` and `enabled` fields.
+      - **Live State**: Uses `publishedOrder` and `publishedEnabled` fields.
+      - **Public Page Logic**: Sorts by `publishedOrder` (fallback to `order` for legacy) and filters by `publishedEnabled` (fallback to `enabled` for legacy).
 
 2.  **Publishing Workflow**:
 
     - When a user clicks "Publish", the API copies `section.data` to `section.publishedData` for all sections.
+    - It also copies `order` to `publishedOrder` and `enabled` to `publishedEnabled`.
+    - **Deletions**: Sections marked with `deletedAt` are permanently deleted from the database.
     - It sets `careersPage.hasUnpublishedChanges` to `false`.
     - **Concurrency Handling**: To prevent race conditions (e.g., a user editing while publishing is in progress), the system checks for any section modifications that occurred _after_ the publish operation started. If found, `hasUnpublishedChanges` remains `true`.
 
@@ -38,12 +48,15 @@ The application implements a robust "Draft vs. Live" system for careers pages, a
 
     - Authenticated users with access to the company can view the _draft_ version of the page.
     - Accessed via `?preview=true` query parameter.
+    - Uses draft `order` and `enabled` status.
     - A sticky banner alerts the user they are in Preview mode.
     - Strict server-side checks ensure only authorized users can access preview content.
 
 4.  **Discard Changes**:
     - Allows users to revert their draft to the last published state.
     - The API copies `publishedData` back to `data` for all sections.
+    - It restores `order` from `publishedOrder` and `enabled` from `publishedEnabled`.
+    - **Restoration**: Sections that were soft-deleted but have `publishedData` are restored (`deletedAt` unset).
     - Sections that were created but never published (no `publishedData`) are deleted.
     - `hasUnpublishedChanges` is set to `false`.
 
@@ -188,7 +201,7 @@ Mongoose schemas defining the data structure.
 - `Job.ts`: Job postings.
 - `Application.ts`: Job applications.
 - `CareersPage.ts`: Configuration for a company's careers page. **Added `hasUnpublishedChanges` field.**
-- `Section.ts`: Individual sections within a careers page. **Added `publishedData` field for storing the live version of section content.**
+- `Section.ts`: Individual sections within a careers page. **Added `publishedData` field for storing the live version of section content. Added `deletedAt` for soft deletes.**
 - `VerificationToken.ts`: Email verification tokens.
 
 ### Scripts (`scripts/`)

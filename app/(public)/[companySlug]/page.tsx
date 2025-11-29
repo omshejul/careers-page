@@ -105,12 +105,11 @@ export default async function PublicCareersPage({
   }
 
   // Get enabled sections - use lean() to get plain objects
+  // Note: We fetch ALL sections (not just enabled: true) because we need to check publishedEnabled for live view
+  // and sorting logic is handled in code.
   const sections = await Section.find({
     careersPageId: careersPage._id,
-    enabled: true,
-  })
-    .sort({ order: "asc" })
-    .lean();
+  }).lean();
 
   // Get published jobs - use lean() to get plain objects
   const jobs = await Job.find({
@@ -132,28 +131,48 @@ export default async function PublicCareersPage({
   const serializedSections = sections
     .filter((section: any) => {
       if (isPreviewMode) {
-        return true;
+        return !section.deletedAt && section.enabled;
       }
-      if (section.publishedData !== undefined && section.publishedData !== null) {
-        return true;
+      // In Public mode:
+      // 1. If section has publishedData, show it (even if deleted in draft)
+      if (
+        section.publishedData !== undefined &&
+        section.publishedData !== null &&
+        Object.keys(section.publishedData).length > 0
+      ) {
+        // Use publishedEnabled if available, otherwise assume enabled (legacy sections were enabled when published)
+        // Important: Do NOT fall back to section.enabled as that's the draft state
+        return section.publishedEnabled ?? true;
       }
       // Fallback for legacy published data before publishedData existed
       // Show draft data only if there are no unpublished changes recorded
-      return !careersPage.hasUnpublishedChanges;
+      // AND if the section is not deleted and is enabled
+      return (
+        !careersPage.hasUnpublishedChanges &&
+        !section.deletedAt &&
+        section.enabled
+      );
     })
     .map((section: any) => {
       const sectionData = isPreviewMode
         ? section.data
-        : section.publishedData ?? section.data;
+        : section.publishedData && Object.keys(section.publishedData).length > 0
+        ? section.publishedData
+        : section.data;
 
       return {
-    ...section,
+        ...section,
         data: sectionData,
-    id: section._id.toString(),
-    careersPageId: section.careersPageId.toString(),
+        // Use publishedOrder for sorting if in public mode and available
+        sortOrder: isPreviewMode
+          ? section.order
+          : section.publishedOrder ?? section.order,
+        id: section._id.toString(),
+        careersPageId: section.careersPageId.toString(),
         _id: undefined,
       };
-    });
+    })
+    .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
 
   const serializedJobs = jobs.map((job: any) => ({
     ...job,
