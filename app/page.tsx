@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PiPalette, PiBriefcase, PiRocket } from "react-icons/pi";
 
 export default async function HomePage() {
   const session = await auth();
@@ -43,21 +44,27 @@ export default async function HomePage() {
 
         <div className="mt-16 grid gap-8 sm:grid-cols-3">
           <div className="space-y-2">
-            <div className="text-2xl font-bold">🎨</div>
+            <div className="flex justify-center">
+              <PiPalette className="h-8 w-8 text-primary" />
+            </div>
             <h3 className="font-semibold">Customizable Design</h3>
             <p className="text-sm text-muted-foreground">
               Build your careers page with drag-and-drop sections
             </p>
           </div>
           <div className="space-y-2">
-            <div className="text-2xl font-bold">💼</div>
+            <div className="flex justify-center">
+              <PiBriefcase className="h-8 w-8 text-primary" />
+            </div>
             <h3 className="font-semibold">Job Management</h3>
             <p className="text-sm text-muted-foreground">
               Post jobs and manage applications in one dashboard
             </p>
           </div>
           <div className="space-y-2">
-            <div className="text-2xl font-bold">🚀</div>
+            <div className="flex justify-center">
+              <PiRocket className="h-8 w-8 text-primary" />
+            </div>
             <h3 className="font-semibold">SEO Optimized</h3>
             <p className="text-sm text-muted-foreground">
               Server-rendered pages with structured data for search engines
