@@ -59,6 +59,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { AddSectionDialog } from "./AddSectionDialog";
 import { EditSectionDialog } from "./EditSectionDialog";
 import { SEOSettingsDialog } from "./SEOSettingsDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { TypedSection } from "@/types/section";
 
 interface BuilderClientProps {
@@ -104,9 +110,8 @@ function getSectionDescription(section: TypedSection): string {
       return data.tagline || "Hero section with title and banner";
     case "ABOUT":
       return data.content
-        ? `${data.content.substring(0, 100)}${
-            data.content.length > 100 ? "..." : ""
-          }`
+        ? `${data.content.substring(0, 100)}${data.content.length > 100 ? "..." : ""
+        }`
         : "About section content";
     case "VALUES":
       return data.values?.length
@@ -114,17 +119,15 @@ function getSectionDescription(section: TypedSection): string {
         : "No values added";
     case "BENEFITS":
       return data.benefits?.length
-        ? `${data.benefits.length} benefit${
-            data.benefits.length > 1 ? "s" : ""
-          }`
+        ? `${data.benefits.length} benefit${data.benefits.length > 1 ? "s" : ""
+        }`
         : "No benefits added";
     case "CULTURE_VIDEO":
       return data.videoUrl ? "Video embedded" : "No video URL";
     case "TEAM_LOCATIONS":
       return data.locations?.length
-        ? `${data.locations.length} location${
-            data.locations.length > 1 ? "s" : ""
-          }`
+        ? `${data.locations.length} location${data.locations.length > 1 ? "s" : ""
+        }`
         : "No locations added";
     case "JOBS_LIST":
       return data.subtitle || "List of job openings";
@@ -183,22 +186,22 @@ function SortableSectionItem({
   return (
     <div ref={setNodeRef} style={style}>
       <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
+        <CardHeader className="p-3 sm:p-6">
+          <div className="flex items-start justify-between gap-2 sm:gap-4">
+            <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
               <div
                 {...attributes}
                 {...listeners}
-                className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+                className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors shrink-0"
               >
-                <PiDotsSixVertical className="h-5 w-5" />
+                <PiDotsSixVertical className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="text-muted-foreground">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap">
+                  <div className="text-muted-foreground shrink-0">
                     {getSectionIcon(section.type)}
                   </div>
-                  <Badge variant="outline" className="capitalize">
+                  <Badge variant="outline" className="capitalize text-xs">
                     {getSectionTypeLabel(section.type)}
                   </Badge>
                   <Badge
@@ -208,26 +211,26 @@ function SortableSectionItem({
                     {section.enabled ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>
-                <CardTitle className="text-base mb-1">
+                <CardTitle className="text-sm sm:text-base mb-1 wrap-break-word">
                   {(section.data as any).title ||
                     getSectionTypeLabel(section.type)}
                 </CardTitle>
-                <CardDescription className="text-sm line-clamp-2">
+                <CardDescription className="text-xs sm:text-sm line-clamp-2 wrap-break-word">
                   {getSectionDescription(section)}
                 </CardDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button size="sm" variant="outline" onClick={onEdit}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-2 shrink-0">
+              <Button size="sm" variant="outline" onClick={onEdit} className="text-xs sm:text-sm px-2 sm:px-3">
                 Edit
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={onDelete}
-                className="text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive text-xs sm:text-sm px-2 sm:px-3"
               >
-                <PiTrash className="h-4 w-4" />
+                <PiTrash className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
@@ -468,72 +471,103 @@ export function BuilderClient({
 
   return (
     <>
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">Careers Page Builder</h1>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={isSyncing || isPublishing ? "syncing" : "synced"}
-                  initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-                  transition={{ duration: 0.2 }}
-                  className={`relative p-2 rounded-full transition-colors ${
-                    isSyncing || isPublishing ? "bg-muted" : "bg-green-0"
-                  }`}
-                >
-                  {isSyncing || isPublishing ? (
-                    <PiSpinner className="h-6 w-6 text-muted-foreground animate-spin" />
-                  ) : (
-                    <motion.div
-                      initial={{ scale: 0, filter: "blur(10px)" }}
-                      animate={{ scale: 1, filter: "blur(0px)" }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 15,
-                        delay: 0.1,
-                      }}
-                    >
-                      <IoCloudDoneOutline className="h-6 w-6 text-green-500" />
-                    </motion.div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+      <div className="container mx-auto p-4 sm:p-6 space-y-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-bold">Careers Page Builder</h1>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={isSyncing || isPublishing ? "syncing" : "synced"}
+                          initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                          exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                          transition={{ duration: 0.2 }}
+                          className={`relative p-2 rounded-full transition-colors ${isSyncing || isPublishing ? "bg-muted" : "bg-green-0"
+                            }`}
+                        >
+                          {isSyncing || isPublishing ? (
+                            <PiSpinner className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground animate-spin" />
+                          ) : (
+                            <motion.div
+                              initial={{ scale: 0, filter: "blur(10px)" }}
+                              animate={{ scale: 1, filter: "blur(0px)" }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 15,
+                                delay: 0.1,
+                              }}
+                            >
+                              <IoCloudDoneOutline className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {isSyncing || isPublishing
+                        ? "Saving changes..."
+                        : "All changes saved to draft"}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Customize your company's careers page
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" className="sm:size-default" asChild>
               <a href={`/${companySlug}?preview=true`} target="_blank">
                 <PiEye className="mr-1 h-4 w-4" />
-                Preview
+                <span className="hidden sm:inline">Preview</span>
+                <span className="sm:hidden">Preview</span>
               </a>
             </Button>
             {careersPage.published && hasUnpublishedChanges && (
               <Button
                 variant="destructive"
+                size="sm"
+                className="sm:size-default"
                 onClick={() => setDiscardDialogOpen(true)}
                 disabled={isDiscarding || isPublishing}
               >
-                {isDiscarding ? "Discarding..." : "Discard Changes"}
+                {isDiscarding ? (
+                  <span className="hidden sm:inline">Discarding...</span>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">Discard Changes</span>
+                    <span className="sm:hidden">Discard</span>
+                  </>
+                )}
               </Button>
             )}
             {(!careersPage.published || hasUnpublishedChanges) && (
               <Button
                 onClick={handlePublish}
+                size="sm"
+                className="sm:size-default"
                 disabled={isPublishing || isDiscarding}
               >
                 <PiGlobe className="mr-1 h-4 w-4" />
-                {isPublishing
-                  ? "Publishing..."
-                  : careersPage.published
-                  ? "Publish Changes"
-                  : "Publish"}
+                {isPublishing ? (
+                  <span className="hidden sm:inline">Publishing...</span>
+                ) : careersPage.published ? (
+                  <>
+                    <span className="hidden sm:inline">Publish Changes</span>
+                    <span className="sm:hidden">Publish</span>
+                  </>
+                ) : (
+                  "Publish"
+                )}
               </Button>
             )}
           </div>
@@ -561,15 +595,15 @@ export function BuilderClient({
         {/* Sections List */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-2">
+              <div className="flex-1">
                 <CardTitle>Page Sections</CardTitle>
-                <CardDescription>
+                <CardDescription className="mt-1.5">
                   Drag and drop to reorder sections. Click and hold the grip
                   icon to drag.
                 </CardDescription>
               </div>
-              <Button onClick={() => setAddSectionOpen(true)}>
+              <Button onClick={() => setAddSectionOpen(true)} className="w-full sm:w-auto shrink-0">
                 <PiPlus className="mr-1 h-4 w-4" />
                 Add Section
               </Button>

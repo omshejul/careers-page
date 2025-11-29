@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { PiSignOut, PiUser, PiSquaresFour } from "react-icons/pi";
 
@@ -57,6 +57,7 @@ export function Header({
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-xs p-0">
+                <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
                 <Sidebar
                   companySlug={companySlug}
                   companyName={companyName}
