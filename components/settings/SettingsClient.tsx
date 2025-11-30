@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import Color from "color";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,6 +26,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  ColorPicker,
+  ColorPickerSelection,
+  ColorPickerHue,
+  ColorPickerEyeDropper,
+  ColorPickerFormat,
+  ColorPickerOutput,
+} from "@/components/ui/shadcn-io/color-picker";
 import { PiTrash, PiWarning } from "react-icons/pi";
 import { toast } from "sonner";
 
@@ -46,6 +60,105 @@ interface SettingsClientProps {
   initialCompany: Company;
 }
 
+interface ColorPickerFieldProps {
+  value?: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
+
+function ColorPickerField({
+  value,
+  onChange,
+  disabled,
+  placeholder,
+}: ColorPickerFieldProps) {
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState(value || "");
+
+  // Convert hex to display color safely
+  const displayColor = (() => {
+    try {
+      return value ? Color(value).hex() : placeholder || "#000000";
+    } catch {
+      return placeholder || "#000000";
+    }
+  })();
+
+  // Handle color picker change (receives RGBA array)
+  const handleColorChange = useCallback(
+    (rgba: Parameters<typeof Color.rgb>[0]) => {
+      try {
+        const color = Color.rgb(rgba);
+        const hex = color.hex();
+        setInputValue(hex);
+        onChange(hex);
+      } catch {
+        // Ignore invalid colors
+      }
+    },
+    [onChange]
+  );
+
+  // Handle manual input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+
+    // Only update if valid hex
+    if (/^#[0-9A-Fa-f]{6}$/.test(newValue)) {
+      onChange(newValue);
+    }
+  };
+
+  // Sync input value when external value changes
+  const handleInputBlur = () => {
+    if (value) {
+      setInputValue(value);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            disabled={disabled}
+            className="h-10 w-14 sm:h-9 sm:w-12 rounded-md border border-input shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 transition-colors hover:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            style={{ backgroundColor: displayColor }}
+            aria-label="Pick a color"
+          />
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-3" align="start">
+          <ColorPicker
+            value={displayColor}
+            onChange={handleColorChange}
+            className="gap-3"
+          >
+            <ColorPickerSelection className="h-32 rounded-lg" />
+            <ColorPickerHue />
+            <div className="flex items-center gap-2">
+              <ColorPickerEyeDropper />
+              <ColorPickerOutput />
+            </div>
+            <ColorPickerFormat />
+          </ColorPicker>
+        </PopoverContent>
+      </Popover>
+      <Input
+        type="text"
+        placeholder={placeholder}
+        value={inputValue}
+        onChange={handleInputChange}
+        onBlur={handleInputBlur}
+        disabled={disabled}
+        className="flex-1 font-mono text-sm"
+      />
+    </div>
+  );
+}
+
 export function SettingsClient({
   companyId,
   companySlug,
@@ -60,6 +173,7 @@ export function SettingsClient({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<Company>({
     defaultValues: company,
@@ -82,7 +196,13 @@ export function SettingsClient({
       const result = await response.json();
       setCompany(result.data);
       toast.success("Company settings updated successfully!");
-      router.refresh();
+
+      // If slug changed, redirect to the new URL
+      if (result.data.slug !== companySlug) {
+        router.push(`/${result.data.slug}/settings`);
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error("Error updating company:", error);
       toast.error(
@@ -208,22 +328,18 @@ export function SettingsClient({
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="primaryColor">Primary Brand Color</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="primaryColor"
-                    type="color"
-                    className="h-10 w-14 sm:h-9 sm:w-12 p-1 flex-shrink-0"
-                    {...register("primaryColor")}
-                    disabled={isSubmitting}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="#0F172A"
-                    {...register("primaryColor")}
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  />
-                </div>
+                <Controller
+                  name="primaryColor"
+                  control={control}
+                  render={({ field }) => (
+                    <ColorPickerField
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={isSubmitting}
+                      placeholder="#0F172A"
+                    />
+                  )}
+                />
                 <p className="text-xs text-muted-foreground">
                   Used for buttons and accents on your public careers page.
                 </p>
@@ -231,22 +347,18 @@ export function SettingsClient({
 
               <div className="space-y-2">
                 <Label htmlFor="secondaryColor">Secondary Brand Color</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="secondaryColor"
-                    type="color"
-                    className="h-10 w-14 sm:h-9 sm:w-12 p-1 flex-shrink-0"
-                    {...register("secondaryColor")}
-                    disabled={isSubmitting}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="#38BDF8"
-                    {...register("secondaryColor")}
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  />
-                </div>
+                <Controller
+                  name="secondaryColor"
+                  control={control}
+                  render={({ field }) => (
+                    <ColorPickerField
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={isSubmitting}
+                      placeholder="#38BDF8"
+                    />
+                  )}
+                />
                 <p className="text-xs text-muted-foreground">
                   Used for subtle highlights and backgrounds.
                 </p>
@@ -269,7 +381,11 @@ export function SettingsClient({
               </p>
             </div>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </CardContent>
@@ -279,7 +395,9 @@ export function SettingsClient({
       {/* Danger Zone */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive text-lg sm:text-xl">Danger Zone</CardTitle>
+          <CardTitle className="text-destructive text-lg sm:text-xl">
+            Danger Zone
+          </CardTitle>
           <CardDescription className="text-sm">
             Irreversible and destructive actions
           </CardDescription>
@@ -299,7 +417,11 @@ export function SettingsClient({
               onOpenChange={setDeleteDialogOpen}
             >
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isDeleting} className="w-full sm:w-auto">
+                <Button
+                  variant="destructive"
+                  disabled={isDeleting}
+                  className="w-full sm:w-auto"
+                >
                   <PiTrash className="mr-2 h-4 w-4" />
                   Delete Company
                 </Button>
@@ -307,7 +429,7 @@ export function SettingsClient({
               <AlertDialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <PiWarning className="h-5 w-5 text-destructive flex-shrink-0" />
+                    <PiWarning className="h-5 w-5 text-destructive shrink-0" />
                     Are you absolutely sure?
                   </AlertDialogTitle>
                   <div className="pt-2 space-y-2">
@@ -325,7 +447,10 @@ export function SettingsClient({
                   </div>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                  <AlertDialogCancel disabled={isDeleting} className="w-full sm:w-auto">
+                  <AlertDialogCancel
+                    disabled={isDeleting}
+                    className="w-full sm:w-auto"
+                  >
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction

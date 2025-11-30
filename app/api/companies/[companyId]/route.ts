@@ -102,6 +102,20 @@ export async function PATCH(
     const body = await request.json()
     const validatedData = updateCompanySchema.parse(body)
 
+    // If slug is being updated, check for uniqueness
+    if (validatedData.slug) {
+      const existingCompany = await Company.findOne({
+        slug: validatedData.slug,
+        _id: { $ne: companyId },
+      })
+      if (existingCompany) {
+        return NextResponse.json(
+          { error: 'A company with this slug already exists' },
+          { status: 400 }
+        )
+      }
+    }
+
     const company = await Company.findByIdAndUpdate(
       companyId,
       validatedData,

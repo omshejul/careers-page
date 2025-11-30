@@ -29,6 +29,12 @@ export const createCompanySchema = z.object({
 
 export const updateCompanySchema = z.object({
   name: z.string().min(1).max(100).optional(),
+  slug: z
+    .string()
+    .min(1, 'Slug is required')
+    .max(50)
+    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens')
+    .optional(),
   description: z.string().max(1000).optional(),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
   logo: z.string().url('Invalid logo URL').optional().or(z.literal('')),

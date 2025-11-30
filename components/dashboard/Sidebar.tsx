@@ -173,10 +173,10 @@ export function Sidebar({
                     href={item.href}
                     onClick={(e) => handleNavClick(item.href, e)}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "bg-linear-to-br from-primary to-primary/80 text-primary-foreground border border-primary/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2),inset_0_-1px_2px_rgba(0,0,0,0.1),0_4px_8px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)]"
+                        : "text-muted-foreground hover:bg-linear-to-br hover:from-muted hover:to-muted/80 hover:text-foreground hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.08)] active:shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)] active:translate-y-[0.5px]",
                       isLoading && "pointer-events-none opacity-70"
                     )}
                   >
@@ -211,10 +211,10 @@ export function Sidebar({
                     href={item.href}
                     onClick={(e) => handleNavClick(item.href, e)}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "bg-linear-to-br from-primary to-primary/80 text-primary-foreground border border-primary/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2),inset_0_-1px_2px_rgba(0,0,0,0.1),0_4px_8px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)]"
+                        : "text-muted-foreground hover:bg-linear-to-br hover:from-muted hover:to-muted/80 hover:text-foreground hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.08)] active:shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)] active:translate-y-[0.5px]",
                       isLoading && "pointer-events-none opacity-70"
                     )}
                   >
