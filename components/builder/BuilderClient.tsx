@@ -546,7 +546,7 @@ export function BuilderClient({
               </TooltipProvider>
             </div>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">
-              Customize your company's careers page
+              Customize your company&apos;s careers page
             </p>
           </div>
         </div>
@@ -650,7 +650,9 @@ export function BuilderClient({
             {sections.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
                 <p>No sections added yet</p>
-                <p className="text-sm">Click "Add Section" to get started</p>
+                <p className="text-sm">
+                  Click &quot;Add Section&quot; to get started
+                </p>
               </div>
             ) : (
               <DndContext
@@ -812,11 +814,11 @@ function ConfirmationDialogs({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this section?</AlertDialogTitle>
             <AlertDialogDescription>
-              You’re about to permanently remove the section "
+              You&apos;re about to permanently remove the section &quot;
               {sectionToDelete
                 ? (sectionToDelete.data as any)?.title || "Untitled"
                 : ""}
-              ". This action cannot be undone.
+              &quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

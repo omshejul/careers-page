@@ -8,7 +8,6 @@ import {
   createJobSchema,
   updateJobSchema,
   type CreateJobInput,
-  type UpdateJobInput,
 } from "@/lib/validations/job";
 import { generateSlug } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

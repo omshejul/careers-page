@@ -136,14 +136,19 @@ export function ApplicationsClient({
                       <CardTitle className="text-lg sm:text-xl break-words">
                         {app.firstName} {app.lastName}
                       </CardTitle>
-                      <Badge variant={getStatusColor(app.status)} className="w-fit">
+                      <Badge
+                        variant={getStatusColor(app.status)}
+                        className="w-fit"
+                      >
                         {app.status}
                       </Badge>
                     </div>
                     <CardDescription className="space-y-1 text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
                         <PiFileText className="h-4 w-4 flex-shrink-0" />
-                        <span className="font-medium break-words">{app.jobTitle}</span>
+                        <span className="font-medium break-words">
+                          {app.jobTitle}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <PiEnvelope className="h-4 w-4 flex-shrink-0" />
@@ -189,7 +194,12 @@ export function ApplicationsClient({
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="flex-1 sm:flex-initial"
+                  >
                     <a
                       href={app.resumeUrl}
                       target="_blank"
@@ -201,7 +211,12 @@ export function ApplicationsClient({
                     </a>
                   </Button>
                   {app.linkedinUrl && (
-                    <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex-1 sm:flex-initial"
+                    >
                       <a
                         href={app.linkedinUrl}
                         target="_blank"
@@ -214,7 +229,12 @@ export function ApplicationsClient({
                     </Button>
                   )}
                   {app.portfolioUrl && (
-                    <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex-1 sm:flex-initial"
+                    >
                       <a
                         href={app.portfolioUrl}
                         target="_blank"

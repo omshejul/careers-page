@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { connectDB, CompanyUser, Company, Job, Application } from '@/lib/db'
+import { connectDB, CompanyUser, Job, Application } from '@/lib/db'
 import mongoose from 'mongoose'
 
 // Helper to check company access

@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { connectDB, CompanyUser, Company, Job } from '@/lib/db'
 import { createCompanySchema } from '@/lib/validations/company'
-import { generateSlug } from '@/lib/utils'
 import mongoose from 'mongoose'
 
 // GET /api/companies - List user's companies
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectDB()
     const session = await auth()

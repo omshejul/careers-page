@@ -47,7 +47,7 @@ export function Header({
   // Close drawer when pathname changes (page loads)
   useEffect(() => {
     setIsOpen(false);
-  }, [pathname]);
+  }, [pathname, setIsOpen]);
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">

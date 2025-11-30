@@ -178,7 +178,7 @@ export function HeroSection({
                     color: "rgba(255,255,255,0.95)",
                   }}
                 >
-                  We're not currently hiring, but check back soon for new
+                  We&apos;re not currently hiring, but check back soon for new
                   opportunities!
                 </p>
               </div>

@@ -48,7 +48,7 @@ export function Sidebar({
   // Clear loading state when pathname changes (navigation completes)
   useEffect(() => {
     setLoadingHref(null);
-  }, [pathname]);
+  }, [pathname, setLoadingHref]);
 
   const mainNavItems = companySlug
     ? [] // Hide main nav when in company context

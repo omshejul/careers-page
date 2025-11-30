@@ -16,15 +16,11 @@ import { PiSpinner, PiUpload } from "react-icons/pi";
 
 interface JobApplicationFormProps {
   jobId: string;
-  jobTitle: string;
-  companySlug: string;
   companyId: string;
 }
 
 export function JobApplicationForm({
   jobId,
-  jobTitle,
-  companySlug,
   companyId,
 }: JobApplicationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);

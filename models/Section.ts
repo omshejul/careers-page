@@ -7,8 +7,8 @@ export interface ISection extends Document {
   type: SectionType
   order: number
   enabled: boolean
-  data: Record<string, any>
-  publishedData?: Record<string, any> // Last published version of data
+  data: Record<string, unknown>
+  publishedData?: Record<string, unknown> // Last published version of data
   publishedOrder?: number
   publishedEnabled?: boolean
   deletedAt?: Date // For soft deletes

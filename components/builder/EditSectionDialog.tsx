@@ -44,7 +44,7 @@ export function EditSectionDialog({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {},
     reset,
     watch,
     setValue,
@@ -309,7 +309,8 @@ export function EditSectionDialog({
               {(!watch("data.values") ||
                 (watch("data.values") as any[]).length === 0) && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No values added yet. Click "Add Value" to get started.
+                  No values added yet. Click &quot;Add Value&quot; to get
+                  started.
                 </p>
               )}
             </div>
@@ -406,7 +407,8 @@ export function EditSectionDialog({
               {(!watch("data.benefits") ||
                 (watch("data.benefits") as any[]).length === 0) && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No benefits added yet. Click "Add Benefit" to get started.
+                  No benefits added yet. Click &quot;Add Benefit&quot; to get
+                  started.
                 </p>
               )}
             </div>
@@ -512,7 +514,8 @@ export function EditSectionDialog({
               {(!watch("data.locations") ||
                 (watch("data.locations") as any[]).length === 0) && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No locations added yet. Click "Add Location" to get started.
+                  No locations added yet. Click &quot;Add Location&quot; to get
+                  started.
                 </p>
               )}
             </div>

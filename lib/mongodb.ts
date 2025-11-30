@@ -2,16 +2,16 @@ import mongoose from 'mongoose'
 
 function getMongoUri(): string {
     const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL
-    
+
     if (!MONGODB_URI) {
         throw new Error('Please define the MONGODB_URI or DATABASE_URL environment variable inside .env')
     }
-    
+
     // Validate it's a MongoDB connection string (not PostgreSQL)
     if (MONGODB_URI.startsWith('postgresql://') || MONGODB_URI.startsWith('postgres://')) {
         throw new Error('DATABASE_URL is set to PostgreSQL. Please set MONGODB_URI to a MongoDB connection string instead.')
     }
-    
+
     return MONGODB_URI
 }
 
@@ -24,7 +24,7 @@ declare global {
     var mongoose: MongooseCache | undefined
 }
 
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null }
+const cached: MongooseCache = global.mongoose || { conn: null, promise: null }
 
 if (!global.mongoose) {
     global.mongoose = cached

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { connectDB, CompanyUser, Job, Application } from '@/lib/db'
+import { connectDB, CompanyUser, Application } from '@/lib/db'
 import mongoose from 'mongoose'
 
 // Helper to check company access
@@ -58,7 +58,7 @@ export async function PATCH(
 
     const body = await request.json()
     const validStatuses = ['PENDING', 'REVIEWING', 'SHORTLISTED', 'REJECTED', 'HIRED']
-    
+
     if (body.status && !validStatuses.includes(body.status)) {
       return NextResponse.json(
         { error: 'Invalid status' },

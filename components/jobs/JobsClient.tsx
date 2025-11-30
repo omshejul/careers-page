@@ -112,14 +112,17 @@ export function JobsClient({
           </AlertTitle>
           <AlertDescription className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300 flex flex-col gap-2">
             <span>
-              You have {jobs.length} job{jobs.length !== 1 ? "s" : ""} posted, but
-              the Jobs List section hasn't been added to your careers page builder
-              yet. Add it to display your jobs on the public careers page.
+              You have {jobs.length} job{jobs.length !== 1 ? "s" : ""} posted,
+              but the Jobs List section hasn&apos;t been added to your careers
+              page builder yet. Add it to display your jobs on the public
+              careers page.
             </span>
-            <Button asChild size="sm" className="w-full sm:w-fit bg-yellow-600 hover:bg-yellow-700 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700">
-              <Link href={`/${companySlug}/builder`}>
-                Go to Builder
-              </Link>
+            <Button
+              asChild
+              size="sm"
+              className="w-full sm:w-fit bg-yellow-600 hover:bg-yellow-700 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700"
+            >
+              <Link href={`/${companySlug}/builder`}>Go to Builder</Link>
             </Button>
           </AlertDescription>
         </Alert>
@@ -128,7 +131,9 @@ export function JobsClient({
       {jobs.length === 0 ? (
         <Card className="py-0">
           <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
-            <p className="text-sm sm:text-base text-muted-foreground mb-4">No jobs posted yet</p>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4">
+              No jobs posted yet
+            </p>
             {canEdit && (
               <Button asChild className="w-full sm:w-auto">
                 <Link href={`/${companySlug}/jobs/new`}>
@@ -147,8 +152,10 @@ export function JobsClient({
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                      <CardTitle className="text-lg sm:text-xl break-words">{job.title}</CardTitle>
-                      <Badge 
+                      <CardTitle className="text-lg sm:text-xl break-words">
+                        {job.title}
+                      </CardTitle>
+                      <Badge
                         variant={job.published ? "default" : "secondary"}
                         className="w-fit"
                       >
@@ -164,7 +171,12 @@ export function JobsClient({
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex-1 sm:flex-initial"
+                    >
                       <a
                         href={`/${companySlug}/jobs/${job.slug}`}
                         target="_blank"
@@ -176,8 +188,16 @@ export function JobsClient({
                     </Button>
                     {canEdit && (
                       <>
-                        <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-initial">
-                          <Link href={`/${companySlug}/jobs/${job.slug}/edit`} className="flex items-center justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="flex-1 sm:flex-initial"
+                        >
+                          <Link
+                            href={`/${companySlug}/jobs/${job.slug}/edit`}
+                            className="flex items-center justify-center"
+                          >
                             <PiPencil className="h-4 w-4 sm:mr-0" />
                             <span className="sm:hidden ml-1">Edit</span>
                           </Link>

@@ -4,7 +4,7 @@ config()
 
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { connectDB, Company, CompanyUser, CareersPage, Section, Job } from '../lib/db'
+import { connectDB, Company, CareersPage, Section, Job } from '../lib/db'
 
 type CsvJobRow = {
     title: string

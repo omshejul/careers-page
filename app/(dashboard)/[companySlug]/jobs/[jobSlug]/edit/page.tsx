@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { IJob } from "@/models/Job";
 
 export default async function EditJobPage({
   params,

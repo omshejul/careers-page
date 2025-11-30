@@ -21,18 +21,43 @@ import {
 } from "@/components/careers/sections";
 import type { Metadata } from "next";
 import { getAbsoluteUrl, getBaseUrl, safeJsonLdStringify } from "@/lib/utils";
+import type { ICompany } from "@/models/Company";
+import type { IJob } from "@/models/Job";
+import type { JobWithCompany } from "@/types";
+
+// Types for serialized objects
+type SerializedCompany = Omit<ICompany, "_id"> & {
+  id: string;
+  _id?: never;
+};
+
+type SerializedSection = {
+  id: string;
+  type: string;
+  order: number;
+  sortOrder: number;
+  enabled: boolean;
+  publishedEnabled?: boolean;
+  deletedAt?: Date | null;
+  data: Record<string, unknown>;
+  publishedData?: Record<string, unknown> | null;
+  careersPageId: string;
+  _id?: never;
+};
+
+type SchemaObject = Record<string, unknown>;
 
 // Helper to build JSON-LD structured data for Organization and JobPosting list
 function buildCareersPageSchema(
-  company: any,
-  jobs: any[],
+  company: SerializedCompany,
+  jobs: JobWithCompany[],
   companySlug: string
 ) {
   const baseUrl = getBaseUrl();
   const careersUrl = `${baseUrl}/${companySlug}`;
 
   // Organization schema
-  const organizationSchema: Record<string, any> = {
+  const organizationSchema: SchemaObject = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: company.name,
@@ -46,7 +71,7 @@ function buildCareersPageSchema(
   }
 
   // WebSite schema for the careers page
-  const webSiteSchema: Record<string, any> = {
+  const webSiteSchema: SchemaObject = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: `${company.name} Careers`,
@@ -59,10 +84,10 @@ function buildCareersPageSchema(
   };
 
   // ItemList schema for job listings (helps Google understand job listing pages)
-  const jobListSchema: Record<string, any> = {
+  const jobListSchema: SchemaObject = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: jobs.slice(0, 10).map((job: any, index: number) => ({
+    itemListElement: jobs.slice(0, 10).map((job, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -190,23 +215,29 @@ export default async function PublicCareersPage({
   const isPreviewMode = preview === "true";
 
   // Get company - use lean() to get plain object
-  const company = (await Company.findOne({ slug: companySlug }).lean()) as any;
+  const companyDoc = (await Company.findOne({ slug: companySlug }).lean()) as
+    | (ICompany & { _id: mongoose.Types.ObjectId })
+    | null;
 
-  if (!company) {
+  if (!companyDoc || !companyDoc._id) {
     notFound();
   }
 
   // Get careers page
-  const careersPage = (await CareersPage.findOne({
-    companyId: company._id,
-  }).lean()) as any;
+  const careersPageDoc = (await CareersPage.findOne({
+    companyId: companyDoc._id,
+  }).lean()) as
+    | (import("@/models/CareersPage").ICareersPage & {
+        _id: mongoose.Types.ObjectId;
+      })
+    | null;
 
-  if (!careersPage) {
+  if (!careersPageDoc) {
     notFound();
   }
 
   // Only show published pages or allow preview for authorized users
-  if (!careersPage.published && !isPreviewMode) {
+  if (!careersPageDoc.published && !isPreviewMode) {
     notFound();
   }
 
@@ -218,7 +249,7 @@ export default async function PublicCareersPage({
     }
     // Verify user has access to this company
     const hasAccess = await CompanyUser.findOne({
-      companyId: company._id,
+      companyId: companyDoc._id,
       userId: new mongoose.Types.ObjectId(session.user.id),
     });
     if (!hasAccess) {
@@ -229,29 +260,31 @@ export default async function PublicCareersPage({
   // Get enabled sections - use lean() to get plain objects
   // Note: We fetch ALL sections (not just enabled: true) because we need to check publishedEnabled for live view
   // and sorting logic is handled in code.
-  const sections = await Section.find({
-    careersPageId: careersPage._id,
-  }).lean();
+  const sections = (await Section.find({
+    careersPageId: careersPageDoc._id,
+  }).lean()) as unknown as (import("@/models/Section").ISection & {
+    _id: mongoose.Types.ObjectId;
+  })[];
 
   // Get published jobs - use lean() to get plain objects
-  const jobs = await Job.find({
-    companyId: company._id,
+  const jobs = (await Job.find({
+    companyId: companyDoc._id,
     published: true,
   })
     .sort({ postedAt: "desc" })
-    .lean();
+    .lean()) as unknown as (IJob & { _id: mongoose.Types.ObjectId })[];
 
   // Serialize to plain objects (convert ObjectIds to strings)
-  const serializedCompany = {
-    ...company,
-    id: company._id.toString(),
-    _id: undefined, // Remove _id to avoid issues
-  } as any;
+  const { _id: companyId, ...companyRest } = companyDoc;
+  const serializedCompany: SerializedCompany = {
+    ...companyRest,
+    id: companyId.toString(),
+  } as SerializedCompany;
 
   // For preview mode: use draft data (show all sections)
   // For published page: only show sections with publishedData
-  const serializedSections = sections
-    .filter((section: any) => {
+  const serializedSections: SerializedSection[] = sections
+    .filter((section) => {
       if (isPreviewMode) {
         return !section.deletedAt && section.enabled;
       }
@@ -270,12 +303,12 @@ export default async function PublicCareersPage({
       // Show draft data only if there are no unpublished changes recorded
       // AND if the section is not deleted and is enabled
       return (
-        !careersPage.hasUnpublishedChanges &&
+        !careersPageDoc.hasUnpublishedChanges &&
         !section.deletedAt &&
         section.enabled
       );
     })
-    .map((section: any) => {
+    .map((section) => {
       const sectionData = isPreviewMode
         ? section.data
         : section.publishedData && Object.keys(section.publishedData).length > 0
@@ -283,32 +316,35 @@ export default async function PublicCareersPage({
         : section.data;
 
       return {
-        ...section,
-        data: sectionData,
-        // Use publishedOrder for sorting if in public mode and available
+        id: section._id.toString(),
+        type: section.type,
+        order: section.order,
         sortOrder: isPreviewMode
           ? section.order
           : section.publishedOrder ?? section.order,
-        id: section._id.toString(),
+        enabled: section.enabled,
+        publishedEnabled: section.publishedEnabled,
+        deletedAt: section.deletedAt,
+        data: sectionData,
+        publishedData: section.publishedData,
         careersPageId: section.careersPageId.toString(),
-        _id: undefined,
       };
     })
-    .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const serializedJobs = jobs.map((job: any) => ({
-    ...job,
-    id: job._id.toString(),
-    companyId: job.companyId.toString(),
-    _id: undefined, // Remove _id
-    company: serializedCompany,
-  }));
+  const serializedJobs: JobWithCompany[] = jobs.map((job) => {
+    const { _id: jobId, companyId: jobCompanyId, ...jobRest } = job;
+    return {
+      ...jobRest,
+      id: jobId.toString(),
+      companyId: jobCompanyId.toString(),
+      company: serializedCompany,
+    } as unknown as JobWithCompany;
+  });
 
   // Filter out HERO section for alternating background calculation
   // HERO always has its own background (image), so we start alternating from the next section
-  const nonHeroSections = serializedSections.filter(
-    (s: any) => s.type !== "HERO"
-  );
+  const nonHeroSections = serializedSections.filter((s) => s.type !== "HERO");
 
   // Build JSON-LD structured data for SEO
   const jsonLdSchemas = buildCareersPageSchema(
@@ -354,9 +390,9 @@ export default async function PublicCareersPage({
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
               </svg>
-              {!careersPage.published
+              {!careersPageDoc.published
                 ? "Preview Mode — This page is not published yet"
-                : careersPage.hasUnpublishedChanges
+                : careersPageDoc.hasUnpublishedChanges
                 ? "Preview Mode — Viewing draft with unpublished changes"
                 : "Preview Mode — No unpublished changes"}
             </span>
@@ -368,7 +404,7 @@ export default async function PublicCareersPage({
             const typedSection = section as unknown as TypedSection;
             // Calculate index among non-hero sections for alternating backgrounds
             const nonHeroIndex = nonHeroSections.findIndex(
-              (s: any) => s.id === section.id
+              (s) => s.id === section.id
             );
             const isAltBackground = nonHeroIndex % 2 === 1;
 

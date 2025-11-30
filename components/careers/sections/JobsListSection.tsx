@@ -332,7 +332,7 @@ export function JobsListSection({
                 No open positions available at the moment
               </h3>
               <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-                We're not currently hiring, but check back soon for new
+                We&apos;re not currently hiring, but check back soon for new
                 opportunities!
               </p>
             </div>

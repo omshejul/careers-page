@@ -15,6 +15,21 @@ import {
 import type { Metadata } from "next";
 import { JobApplicationForm } from "@/components/jobs/JobApplicationForm";
 import { MarkdownContent } from "@/components/jobs/MarkdownContent";
+import type { ICompany } from "@/models/Company";
+import type { IJob } from "@/models/Job";
+
+type SerializedCompany = Omit<ICompany, "_id"> & {
+  id: string;
+  _id?: never;
+};
+
+type SerializedJob = Omit<IJob, "_id" | "companyId"> & {
+  id: string;
+  companyId: string;
+  _id?: never;
+};
+
+type SchemaObject = Record<string, unknown>;
 
 // Helper to map employment type to schema.org values
 function getSchemaEmploymentType(employmentType?: string): string[] {
@@ -37,14 +52,14 @@ function getSchemaEmploymentType(employmentType?: string): string[] {
 
 // Helper to build JSON-LD JobPosting schema
 function buildJobPostingSchema(
-  job: any,
-  company: any,
+  job: SerializedJob,
+  company: SerializedCompany,
   companySlug: string,
   jobSlug: string
 ) {
   const baseUrl = getBaseUrl();
 
-  const schema: Record<string, any> = {
+  const schema: SchemaObject = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: job.title,
@@ -156,18 +171,19 @@ export async function generateMetadata({
     };
   }
 
-  const job = (await Job.findOne({
+  const jobDoc = await Job.findOne({
     companyId: company._id,
     slug: jobSlug,
     published: true,
-  }).lean()) as any;
+  }).lean();
 
-  if (!job) {
+  if (!jobDoc) {
     return {
       title: "Job Not Found",
     };
   }
 
+  const job = jobDoc as unknown as SerializedJob;
   const title = `${job.title} at ${company.name}`;
   const baseDescription = job.description
     ? truncate(
@@ -258,12 +274,22 @@ export default async function JobDetailPage({
     notFound();
   }
 
-  const job = jobDoc.toObject();
+  const jobObj = jobDoc.toObject();
+  const serializedJob: SerializedJob = {
+    ...jobObj,
+    id: jobObj._id.toString(),
+    companyId: jobObj.companyId.toString(),
+  } as SerializedJob;
+
+  const serializedCompany: SerializedCompany = {
+    ...company.toObject(),
+    id: company._id.toString(),
+  } as SerializedCompany;
 
   // Build JSON-LD structured data for SEO
   const jobPostingSchema = buildJobPostingSchema(
-    job,
-    company,
+    serializedJob,
+    serializedCompany,
     companySlug,
     jobSlug
   );
@@ -295,42 +321,48 @@ export default async function JobDetailPage({
           <div className="mx-auto max-w-4xl">
             <div className="mb-8">
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">{job.department || "General"}</Badge>
-                {job.jobType && <Badge variant="outline">{job.jobType}</Badge>}
-                {job.employmentType && (
-                  <Badge variant="outline">{job.employmentType}</Badge>
+                <Badge variant="secondary">
+                  {serializedJob.department || "General"}
+                </Badge>
+                {serializedJob.jobType && (
+                  <Badge variant="outline">{serializedJob.jobType}</Badge>
+                )}
+                {serializedJob.employmentType && (
+                  <Badge variant="outline">
+                    {serializedJob.employmentType}
+                  </Badge>
                 )}
               </div>
 
               <h1 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl">
-                {job.title}
+                {serializedJob.title}
               </h1>
 
               <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-                {job.location && (
+                {serializedJob.location && (
                   <div className="flex items-center gap-2">
                     <PiMapPin className="h-5 w-5" />
-                    <span>{job.location}</span>
+                    <span>{serializedJob.location}</span>
                   </div>
                 )}
-                {job.department && (
+                {serializedJob.department && (
                   <div className="flex items-center gap-2">
                     <PiBuilding className="h-5 w-5" />
-                    <span>{job.department}</span>
+                    <span>{serializedJob.department}</span>
                   </div>
                 )}
-                {job.postedAt && (
+                {serializedJob.postedAt && (
                   <div className="flex items-center gap-2">
                     <PiClock className="h-5 w-5" />
-                    <span>{getPostedTimeAgo(job.postedAt)}</span>
+                    <span>{getPostedTimeAgo(serializedJob.postedAt)}</span>
                   </div>
                 )}
               </div>
 
-              {job.salaryRange && (
+              {serializedJob.salaryRange && (
                 <div className="mt-4">
                   <p className="text-base font-semibold text-foreground sm:text-lg">
-                    {job.salaryRange}
+                    {serializedJob.salaryRange}
                   </p>
                 </div>
               )}
@@ -346,8 +378,8 @@ export default async function JobDetailPage({
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {job.description ? (
-                      <MarkdownContent content={job.description} />
+                    {serializedJob.description ? (
+                      <MarkdownContent content={serializedJob.description} />
                     ) : (
                       <p className="text-muted-foreground">
                         No description available.
@@ -356,7 +388,7 @@ export default async function JobDetailPage({
                   </CardContent>
                 </Card>
 
-                {job.workPolicy && (
+                {serializedJob.workPolicy && (
                   <Card className="mt-6">
                     <CardHeader>
                       <CardTitle className="text-lg font-bold sm:text-xl">
@@ -364,7 +396,9 @@ export default async function JobDetailPage({
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="leading-relaxed">{job.workPolicy}</p>
+                      <p className="leading-relaxed">
+                        {serializedJob.workPolicy}
+                      </p>
                     </CardContent>
                   </Card>
                 )}
@@ -380,10 +414,8 @@ export default async function JobDetailPage({
                   </CardHeader>
                   <CardContent>
                     <JobApplicationForm
-                      jobId={job._id.toString()}
-                      jobTitle={job.title}
-                      companySlug={companySlug}
-                      companyId={company._id.toString()}
+                      jobId={serializedJob.id}
+                      companyId={serializedCompany.id}
                     />
                   </CardContent>
                 </Card>

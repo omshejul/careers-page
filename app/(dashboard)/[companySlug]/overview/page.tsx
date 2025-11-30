@@ -72,8 +72,12 @@ export default async function CompanyOverviewPage({
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold truncate">{company.name}</h1>
-            <p className="text-sm sm:text-base text-muted-foreground line-clamp-2">{company.description}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold truncate">
+              {company.name}
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground line-clamp-2">
+              {company.description}
+            </p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -178,7 +182,9 @@ export default async function CompanyOverviewPage({
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium">Name</label>
-            <p className="text-sm text-muted-foreground break-words">{company.name}</p>
+            <p className="text-sm text-muted-foreground break-words">
+              {company.name}
+            </p>
           </div>
           {company.description && (
             <div>

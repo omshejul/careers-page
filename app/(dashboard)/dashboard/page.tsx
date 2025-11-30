@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { connectDB, CompanyUser, Company, Job, Application } from "@/lib/db";
+import { connectDB, CompanyUser, Job, Application } from "@/lib/db";
 import mongoose from "mongoose";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,14 +18,9 @@ import {
 import Link from "next/link";
 import { CreateCompanyDialog } from "@/components/dashboard/CreateCompanyDialog";
 import { Suspense } from "react";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ new?: string }>;
-}) {
+export default async function DashboardPage() {
   await connectDB();
   const session = await auth();
 
@@ -107,7 +102,9 @@ export default async function DashboardPage({
                 <PiBuildings className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{validCompanies.length}</div>
+                <div className="text-2xl font-bold">
+                  {validCompanies.length}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Total companies managed
                 </p>

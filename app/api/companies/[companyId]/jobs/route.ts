@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { connectDB, CompanyUser, Company, Job } from '@/lib/db'
+import { connectDB, CompanyUser, Job } from '@/lib/db'
 import mongoose from 'mongoose'
 
 // Helper to check company access
@@ -87,7 +87,7 @@ export async function POST(
 
     const body = await request.json()
     const { generateSlug } = await import('@/lib/utils')
-    
+
     // Generate slug from title if not provided
     const slug = body.slug || generateSlug(body.title)
 
