@@ -3,6 +3,7 @@ import { Geist_Mono, Figtree, Young_Serif } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/auth/SessionProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { getAbsoluteUrl } from "@/lib/utils";
 
 const hubotSans = Figtree({
   variable: "--font-geist-sans",
@@ -24,9 +25,19 @@ export const metadata: Metadata = {
   title: "Carrot - Careers Page Builder",
   description:
     "Build beautiful careers pages and manage job applications. Create custom sections, publish job listings, and streamline your hiring process.",
-  keywords: ["careers page", "job board", "hiring", "recruitment", "ATS", "applicant tracking"],
+  keywords: [
+    "careers page",
+    "job board",
+    "hiring",
+    "recruitment",
+    "ATS",
+    "applicant tracking",
+  ],
   authors: [{ name: "Om Shejul" }],
   creator: "Om Shejul",
+  alternates: {
+    canonical: getAbsoluteUrl("/"),
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },
@@ -52,6 +63,14 @@ export const metadata: Metadata = {
     title: "Carrot - Careers Page Builder",
     description: "Build beautiful careers pages and manage job applications",
     type: "website",
+    url: getAbsoluteUrl("/"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Carrot - Careers Page Builder",
+    description:
+      "Build beautiful careers pages and manage job applications. Create custom sections, publish job listings, and streamline your hiring process.",
+    creator: "@omshejul", 
   },
 };
 

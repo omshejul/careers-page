@@ -44,3 +44,37 @@ export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.substring(0, maxLength).trim() + "...";
 }
+
+/**
+ * Get the base URL for the application
+ * Uses NEXT_PUBLIC_APP_URL or AUTH_URL environment variable, falls back to secure HTTPS URL
+ */
+export function getBaseUrl(): string {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.AUTH_URL ||
+    "https://example.com";
+
+  // Remove trailing slash from baseUrl
+  return baseUrl.replace(/\/$/, "");
+}
+
+/**
+ * Get the absolute URL for a given path
+ * Uses NEXT_PUBLIC_APP_URL environment variable or falls back to secure HTTPS URL
+ */
+export function getAbsoluteUrl(path: string = ""): string {
+  const cleanBaseUrl = getBaseUrl();
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${cleanBaseUrl}${cleanPath}`;
+}
+
+/**
+ * Safely stringify JSON for use in script tags (JSON-LD)
+ * Escapes < characters to prevent XSS attacks
+ * @see https://nextjs.org/docs/app/building-your-application/optimizing/metadata#json-ld
+ */
+export function safeJsonLdStringify(data: Record<string, unknown>): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}

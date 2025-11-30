@@ -20,3 +20,15 @@ asked opus 4.5 to follow the cursor rules and plan the dashboard
 went back and forth with some changes and made a simple MVP. 
 
 
+seo optimised for
+Dynamic title from seoTitle or fallback to "Careers at {company}"
+Dynamic description from seoDescription or company description
+Job Detail Page (/[companySlug]/jobs/[jobSlug]):
+Dynamic description: First 160 chars of job description
+Basic Open Graph tags, Favicons setup, Keywords, authors
+JSON-LD Structured Data	- Google uses JobPosting schema for rich job results
+Open Graph image/url on public pages - Better social sharing
+Twitter Card meta tags - Better Twitter sharing
+Canonical URLs - Prevents duplicate content
+Sitemap generation - Helps crawlers find pages
+robots.txt - Basic crawl directives

@@ -20,14 +20,97 @@ import {
   JobsListSection,
 } from "@/components/careers/sections";
 import type { Metadata } from "next";
+import { getAbsoluteUrl, getBaseUrl, safeJsonLdStringify } from "@/lib/utils";
+
+// Helper to build JSON-LD structured data for Organization and JobPosting list
+function buildCareersPageSchema(
+  company: any,
+  jobs: any[],
+  companySlug: string
+) {
+  const baseUrl = getBaseUrl();
+  const careersUrl = `${baseUrl}/${companySlug}`;
+
+  // Organization schema
+  const organizationSchema: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: company.name,
+    url: company.website || careersUrl,
+    description: company.description,
+  };
+
+  if (company.logo) {
+    organizationSchema.logo = company.logo;
+    organizationSchema.image = company.logo;
+  }
+
+  // WebSite schema for the careers page
+  const webSiteSchema: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: `${company.name} Careers`,
+    url: careersUrl,
+    publisher: {
+      "@type": "Organization",
+      name: company.name,
+      logo: company.logo || undefined,
+    },
+  };
+
+  // ItemList schema for job listings (helps Google understand job listing pages)
+  const jobListSchema: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: jobs.slice(0, 10).map((job: any, index: number) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "JobPosting",
+        title: job.title,
+        description: job.description
+          ? job.description.substring(0, 200)
+          : `${job.title} at ${company.name}`,
+        datePosted: job.postedAt
+          ? new Date(job.postedAt).toISOString()
+          : new Date().toISOString(),
+        validThrough: job.expiresAt
+          ? new Date(job.expiresAt).toISOString()
+          : undefined,
+        hiringOrganization: {
+          "@type": "Organization",
+          name: company.name,
+          sameAs: company.website || undefined,
+          logo: company.logo || undefined,
+        },
+        jobLocation: job.location
+          ? {
+              "@type": "Place",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: job.location,
+              },
+            }
+          : undefined,
+        url: `${baseUrl}/${companySlug}/jobs/${job.slug}`,
+      },
+    })),
+  };
+
+  return [organizationSchema, webSiteSchema, jobListSchema];
+}
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ companySlug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }): Promise<Metadata> {
   await connectDB();
   const { companySlug } = await params;
+  const { preview } = await searchParams;
+  const isPreviewMode = preview === "true";
   const company = await Company.findOne({ slug: companySlug });
 
   if (!company) {
@@ -44,13 +127,52 @@ export async function generateMetadata({
     };
   }
 
-  return {
-    title: careersPage.seoTitle || `Careers at ${company.name}`,
-    description:
-      careersPage.seoDescription ||
-      company.description ||
-      `Join the team at ${company.name}`,
+  const title = careersPage.seoTitle || `Careers at ${company.name}`;
+  const description =
+    careersPage.seoDescription ||
+    company.description ||
+    `Join the team at ${company.name}. Explore open positions and learn about our culture, values, and benefits.`;
+
+  const url = getAbsoluteUrl(`/${companySlug}`);
+  const ogImage = company.brandBannerUrl || company.logo || undefined;
+
+  // Don't set canonical URL for preview mode to avoid indexing draft content
+  const metadata: Metadata = {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: isPreviewMode ? undefined : url, // Don't set OG url for preview mode
+      siteName: company.name,
+      type: "website",
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              alt: `${company.name} Careers`,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ogImage ? [ogImage] : undefined,
+    },
   };
+
+  // Only add canonical URL if not in preview mode
+  if (!isPreviewMode) {
+    metadata.alternates = {
+      canonical: url,
+    };
+  }
+
+  return metadata;
 }
 
 export default async function PublicCareersPage({
@@ -157,8 +279,8 @@ export default async function PublicCareersPage({
       const sectionData = isPreviewMode
         ? section.data
         : section.publishedData && Object.keys(section.publishedData).length > 0
-          ? section.publishedData
-          : section.data;
+        ? section.publishedData
+        : section.data;
 
       return {
         ...section,
@@ -188,136 +310,156 @@ export default async function PublicCareersPage({
     (s: any) => s.type !== "HERO"
   );
 
+  // Build JSON-LD structured data for SEO
+  const jsonLdSchemas = buildCareersPageSchema(
+    serializedCompany,
+    serializedJobs,
+    companySlug
+  );
+
   return (
-    <div className="flex min-h-svh flex-col">
-      {/* Preview Mode Banner */}
-      {isPreviewMode && (
-        <div className="sticky top-0 z-50 bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950">
-          <span className="inline-flex items-center gap-2">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-            </svg>
-            {!careersPage.published
-              ? "Preview Mode — This page is not published yet"
-              : careersPage.hasUnpublishedChanges
+    <>
+      {/* JSON-LD Structured Data for SEO */}
+      {jsonLdSchemas.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: safeJsonLdStringify(schema),
+          }}
+        />
+      ))}
+
+      <div className="flex min-h-svh flex-col">
+        {/* Preview Mode Banner */}
+        {isPreviewMode && (
+          <div className="sticky top-0 z-50 bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950">
+            <span className="inline-flex items-center gap-2">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              {!careersPage.published
+                ? "Preview Mode — This page is not published yet"
+                : careersPage.hasUnpublishedChanges
                 ? "Preview Mode — Viewing draft with unpublished changes"
                 : "Preview Mode — No unpublished changes"}
-          </span>
+            </span>
+          </div>
+        )}
+
+        <div className="flex-1">
+          {serializedSections.map((section) => {
+            const typedSection = section as unknown as TypedSection;
+            // Calculate index among non-hero sections for alternating backgrounds
+            const nonHeroIndex = nonHeroSections.findIndex(
+              (s: any) => s.id === section.id
+            );
+            const isAltBackground = nonHeroIndex % 2 === 1;
+
+            switch (typedSection.type) {
+              case "HERO":
+                return (
+                  <HeroSection
+                    key={section.id}
+                    section={typedSection}
+                    hasJobs={serializedJobs.length > 0}
+                    primaryColor={serializedCompany.primaryColor}
+                    brandBannerUrl={serializedCompany.brandBannerUrl}
+                    companyLogo={serializedCompany.logo}
+                  />
+                );
+              case "ABOUT":
+                return (
+                  <AboutSection
+                    key={section.id}
+                    section={typedSection}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              case "VALUES":
+                return (
+                  <ValuesSection
+                    key={section.id}
+                    section={typedSection}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              case "BENEFITS":
+                return (
+                  <BenefitsSection
+                    key={section.id}
+                    section={typedSection}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              case "CULTURE_VIDEO":
+                return (
+                  <CultureVideoSection
+                    key={section.id}
+                    section={typedSection}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              case "TEAM_LOCATIONS":
+                return (
+                  <TeamLocationsSection
+                    key={section.id}
+                    section={typedSection}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              case "JOBS_LIST":
+                return (
+                  <JobsListSection
+                    key={section.id}
+                    section={typedSection}
+                    jobs={serializedJobs}
+                    companySlug={companySlug}
+                    isAltBackground={isAltBackground}
+                  />
+                );
+              default:
+                return null;
+            }
+          })}
         </div>
-      )}
 
-      <div className="flex-1">
-        {serializedSections.map((section) => {
-          const typedSection = section as unknown as TypedSection;
-          // Calculate index among non-hero sections for alternating backgrounds
-          const nonHeroIndex = nonHeroSections.findIndex(
-            (s: any) => s.id === section.id
-          );
-          const isAltBackground = nonHeroIndex % 2 === 1;
-
-          switch (typedSection.type) {
-            case "HERO":
-              return (
-                <HeroSection
-                  key={section.id}
-                  section={typedSection}
-                  hasJobs={serializedJobs.length > 0}
-                  primaryColor={serializedCompany.primaryColor}
-                  brandBannerUrl={serializedCompany.brandBannerUrl}
-                  companyLogo={serializedCompany.logo}
-                />
-              );
-            case "ABOUT":
-              return (
-                <AboutSection
-                  key={section.id}
-                  section={typedSection}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            case "VALUES":
-              return (
-                <ValuesSection
-                  key={section.id}
-                  section={typedSection}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            case "BENEFITS":
-              return (
-                <BenefitsSection
-                  key={section.id}
-                  section={typedSection}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            case "CULTURE_VIDEO":
-              return (
-                <CultureVideoSection
-                  key={section.id}
-                  section={typedSection}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            case "TEAM_LOCATIONS":
-              return (
-                <TeamLocationsSection
-                  key={section.id}
-                  section={typedSection}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            case "JOBS_LIST":
-              return (
-                <JobsListSection
-                  key={section.id}
-                  section={typedSection}
-                  jobs={serializedJobs}
-                  companySlug={companySlug}
-                  isAltBackground={isAltBackground}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
+        {/* Footer */}
+        <footer className="mt-auto border-t bg-muted/30 py-8">
+          <div className="container px-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} {serializedCompany.name || "Company"}
+              . All rights reserved.
+            </p>
+            {serializedCompany.website && (
+              <a
+                href={serializedCompany.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-sm text-primary hover:underline"
+              >
+                Visit our website
+              </a>
+            )}
+          </div>
+        </footer>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-auto border-t bg-muted/30 py-8">
-        <div className="container px-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {serializedCompany.name || "Company"}.
-            All rights reserved.
-          </p>
-          {serializedCompany.website && (
-            <a
-              href={serializedCompany.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-block text-sm text-primary hover:underline"
-            >
-              Visit our website
-            </a>
-          )}
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }
